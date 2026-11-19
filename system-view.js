@@ -21,6 +21,10 @@ export function mountSystem(root, data, options) {
   q('.perspective').value = options.controller || '';
   q('.perspective').onchange = (e) => options.change(data.start ?? -1, e.target.value);
   makeOption(q('.follow'), 'System center', '');
+  if (data.frames.length) {
+    makeOption(q('.follow'), 'Encounter', 'encounter');
+    q('.follow').value = 'encounter';
+  }
   let trackMenu = '';
   const frames = data.frames,
     range = q('input'),
@@ -68,12 +72,22 @@ export function mountSystem(root, data, options) {
       const select = q('.follow'),
         current = select.value;
       select.replaceChildren(new Option('System center', ''));
+      if (frames.length) makeOption(select, 'Encounter', 'encounter');
       for (const ship of known) makeOption(select, ship.role + ' · ' + ship.id, ship.id);
-      select.value = known.some((s) => s.id === current) ? current : '';
+      select.value = current === 'encounter' || known.some((s) => s.id === current) ? current : '';
       trackMenu = ids;
     }
-    const focus = followed?.p || [0, 0, 0],
-      k = Math.min(w / (f ? 11.8 : 8.7), h / (f ? 8 : 5.8)) * zoom;
+    let focus = followed?.p || [0, 0, 0],
+      span = f ? 11.8 : 8.7;
+    if (followed) span = 2;
+    else if (q('.follow').value === 'encounter' && known.length) {
+      const points = known.map((s) => s.p);
+      const low = [0, 1, 2].map((axis) => Math.min(...points.map((p) => p[axis])));
+      const high = [0, 1, 2].map((axis) => Math.max(...points.map((p) => p[axis])));
+      focus = low.map((v, i) => (v + high[i]) / 2);
+      span = Math.max(0.55, 1.65 * Math.hypot(...high.map((v, i) => v - low[i])));
+    }
+    const k = Math.min(w / span, h / (span * 0.73)) * zoom;
     function project(p) {
       const [x, y, z] = p.map((n, i) => n - focus[i]),
         u = x * Math.cos(yaw) - y * Math.sin(yaw),
@@ -194,15 +208,47 @@ export function mountSystem(root, data, options) {
         g.fillText(ship.role, x + 15, y - 10);
       }
     }
+    // Label tight formations once. Ships keep their physical positions at every zoom level.
+    const labels = [];
+    for (const ship of known) {
+      const [x, y] = project(ship.p);
+      if (x < 0 || y < 0 || x > w || y > h) continue;
+      const cluster = labels.find((l) => l.owner === ship.owner && Math.hypot(l.x - x, l.y - y) < 24);
+      if (cluster) {
+        cluster.count++;
+        if (ship.role === 'Command') cluster.role = ship.role;
+        continue;
+      }
+      labels.push({ x, y, owner: ship.owner, count: 1, role: ship.role });
+    }
+    const placed = [];
+    for (const label of labels) {
+      const { x, y, role, count } = label,
+        text = count === 1 ? role : (role === 'Battery' ? 'Defense' : 'Fleet') + ' · ' + count + ' units';
+      if (followed && Math.hypot(x - w / 2, y - h / 2) < 12) continue;
+      const tx = Math.min(w - 85, x + 12),
+        ty = Math.min(h - 8, Math.max(15, y + 18));
+      if (placed.some((p) => Math.abs(tx - p[0]) < 74 && Math.abs(ty - p[1]) < 15)) continue;
+      placed.push([tx, ty]);
+      g.font = '11px system-ui';
+      g.lineWidth = 3;
+      g.strokeStyle = '#081321';
+      g.strokeText(text, tx, ty);
+      g.fillStyle = '#dce9eb';
+      g.fillText(text, tx, ty);
+    }
     const recent = data.events.filter((e) => e.time <= time);
     for (const e of recent.slice(-24))
       if (time - e.time <= 0.125 && e.kind === 'pulse' && e.to)
         line(project(e.at), project(e.to), '#ffc892', 1.5);
-    const scaleWidth = k * (zoom > 2 ? 0.5 : 1);
+    const nominal = 60 / k,
+      decade = 10 ** Math.floor(Math.log10(nominal));
+    const units = ([5, 2, 1].find((n) => n * decade <= nominal) || 1) * decade;
+    const scaleWidth = k * units;
     line([16, h - 15], [16 + scaleWidth, h - 15], '#8da7b4');
     g.font = '10px monospace';
     g.fillStyle = '#bfd4d8';
-    g.fillText(zoom > 2 ? '0.5 AU' : '1 AU', 16, h - 22);
+    g.fillText(Number(units.toPrecision(2)) + ' AU', 16, h - 22);
     const date = options.date(Math.floor(time));
     q('time').textContent = date;
     q('output').textContent = f ? 'Month ' + time.toFixed(2) : 'Orbital positions';
