@@ -14,11 +14,11 @@ Open **http://127.0.0.1:4173/**. The project uses Node built-ins and browser API
 
 ## Observe
 
-The Vesper Passage opens at a recorded decision in a fully simulated galaxy. Click a system or select one from the inspector. Switch to **Local intelligence** to anchor the map and event feed to that receiver, then select another star to inspect the evidence available about it. Scroll to zoom, drag to pan, and use **Fit** for the entire galaxy.
+The Vesper Passage opens at a recorded decision in a fully simulated galaxy. Drag the 3D map to orbit, Shift-drag to pan, scroll to zoom, and use **Fit** to reset the view. Click a system or select one from **System intelligence**. Switch to **Local intelligence** to anchor the map and news feed to that receiver, then select another star to inspect the evidence available about it.
 
-**Follow action** starts on and moves the camera to selected battles, diplomatic developments, scientific breakthroughs, and other highlights. **Guided** playback slows around highlights while the clock keeps advancing. **Fixed** uses your selected rate in years per second. **Fullscreen** keeps the map, timeline, and playback controls together. Scrub to any month, step a month, or jump to the next highlight.
+Enable **Follow action** to move the camera to selected contests, diplomatic developments, scientific breakthroughs, and other highlights. **Guided** playback slows around highlights while the clock keeps advancing. **Fixed** uses your selected rate in years per second. **Fullscreen** keeps the map, sidebar, and playback controls together. Scrub to any month, step a month, or jump to the next event.
 
-Battle highlights open an orbitable 3D reconstruction during playback. Use **Watch 3D battle** to return to it from a highlight or battle record. Fleets and effects illustrate the logged outcome. New runs also show the recorded starting strengths. The **Chronicle** shows past events at the chosen date. **Lineages** shows the annual galaxy census, including descendants who live under another civilization's control.
+The sidebar news feed follows the simulation clock, newest first. Open a headline for the full record and a shortcut to the event on the map. Contest records include the outcome and recorded strengths when available. The **Chronicle** shows past events at the chosen date. **Lineages** shows the annual galaxy census, including descendants who live under another civilization's control.
 
 Inspect an order to see its local evidence, reserves, action probability, and alternatives. Choose a different order to create a branch. Scrub the alternate timeline to compare the original and alternate at the same date. **Compare received evidence** finds their first differing recorded local observation or outcome in the requested window.
 
@@ -26,7 +26,7 @@ Use **New run** to change seed, duration, population, and starting scenario. **S
 
 ## Mechanics
 
-The engine advances in months. Signals travel at light speed, fast expeditions at one-third light speed, and cargo at one-fifth. Unaffiliated observers receive delayed and noisy industrial or launch traces, supplemented by deep-sky observations. Departures, physical arrivals, and news of outcomes have separate dates. Reports from an earlier observation cannot overwrite a more recent observation.
+The engine advances in months. Three-dimensional distances govern expedition range, travel time, and signal delays. Signals travel at light speed, fast expeditions at one-third light speed, and cargo at one-fifth. Unaffiliated observers receive delayed and noisy industrial or launch traces, supplemented by deep-sky observations. Departures, physical arrivals, and news of outcomes have separate dates. Reports from an earlier observation cannot overwrite a more recent observation. Saved runs from the original ruleset retain their flat geometry and original timelines.
 
 Controllers decide from their local contacts, reserves, infrastructure, relations, and experience. Older production sites become less productive. Garrison upkeep competes with civilian supply. Colonists and military settlement contingents travel as part of the population ledger. An expedition can claim a poorly defended settlement or come home after meeting unexpected resistance. Capturing infrastructure keeps its residents and changes who can direct its resources.
 

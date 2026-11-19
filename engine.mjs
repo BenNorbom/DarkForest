@@ -1,6 +1,6 @@
 import { chooseAction, actionProbabilities, feedbackValue, learnFeedback } from './policy.mjs';
 
-export const RULESET = 'parallax-1';
+export const RULESET = 'parallax-2';
 export const palette = [
   '#baf186',
   '#7bcafa',
@@ -97,23 +97,25 @@ export function simulate({
   count = Math.max(2, count | 0);
   systems = Math.max(count + 2, systems | 0);
   const rand = rng(hash(seed, 'map')),
-    scale = (Math.sqrt(systems) * 3.25) / 100;
+    depth = rng(hash(seed, 'map-depth')),
+    scale = 0.43 * Math.cbrt(systems / 240);
   const chart = Array.from({ length: systems }, (_, i) => ({
     id: i,
     name: roots[i % roots.length] + suffixes[Math.floor(i / roots.length) % suffixes.length],
     x: 4 + rand() * 92,
     y: 5 + rand() * 90,
+    z: (depth() - depth()) * 24,
     richness: 0.65 + rand() * 0.85,
     mineral: i % 3,
     home: i < count,
   }));
   if (scenario === 'corridor') {
-    const set = (i, name, x, y) => Object.assign(chart[i], { name, x, y });
-    set(0, 'Vesper', 43, 49);
-    set(1, 'Orison', 43 + 6 / scale, 49);
-    set(2, 'Nacre', 42, 49 + 7 / scale);
-    set(count, 'Haven', 44 + 3 / scale, 49 + 2 / scale);
-    set(count + 1, 'Lumen', 43 + 5 / scale, 49 - 3 / scale);
+    const set = (i, name, x, y, z) => Object.assign(chart[i], { name, x, y, z });
+    set(0, 'Vesper', 43, 49, 0);
+    set(1, 'Orison', 43 + Math.sqrt(32) / scale, 49, 2 / scale);
+    set(2, 'Nacre', 42, 49 + 6.5 / scale, -1.5 / scale);
+    set(count, 'Haven', 43 + 3 / scale, 49 + 1 / scale, -1 / scale);
+    set(count + 1, 'Lumen', 43 + 5 / scale, 49 - 2 / scale, 1.5 / scale);
   }
   const seen = new Set();
   for (const s of chart) {
@@ -134,7 +136,7 @@ export function simulate({
     losses: 0,
     discoveries: 0,
   }));
-  const dist = chart.map((a) => chart.map((b) => Math.hypot(a.x - b.x, a.y - b.y) * scale));
+  const dist = chart.map((a) => chart.map((b) => Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z) * scale));
   const nearby = dist.map((row) =>
     row
       .map((_, i) => i)

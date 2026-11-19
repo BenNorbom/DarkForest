@@ -13,6 +13,7 @@ test('recording and replay preserve all seeded survival outcomes', () => {
   assert.deepEqual(replay.metrics, simulate({ ...cfg, detail: false }).metrics);
   assert.deepEqual(replay.events, simulate(cfg).events);
   assert.equal(index.run.chart.length, 32);
+  assert.ok(new Set(replay.chart.map((s) => s.z)).size > 1);
 });
 test('a six-light-year route distinguishes departure, receipt, and arrival', () => {
   assert.equal(travelMonths(6, 1), 72);
@@ -21,8 +22,15 @@ test('a six-light-year route distinguishes departure, receipt, and arrival', () 
   for (const e of replay.events.filter((e) => e.report)) {
     const a = replay.chart[e.site],
       b = replay.chart[e.target];
-    const d = Math.hypot(a.x - b.x, a.y - b.y) * replay.scale;
+    const d = Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z) * replay.scale;
     assert.ok(e.t - e.origin >= travelMonths(d, 1));
+  }
+  for (const f of replay.flights) {
+    const a = replay.chart[f.from],
+      b = replay.chart[f.to];
+    const d = Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z) * replay.scale;
+    const speed = f.kind === 'signal' ? 1 : ['survey', 'contest'].includes(f.kind) ? 1 / 3 : 0.2;
+    assert.equal(f.end - f.start, travelMonths(d, speed));
   }
 });
 test('local views begin without hidden settlements and reveal only delivered reports', () => {
@@ -110,21 +118,20 @@ test('saved evaluation reproduces a held-out trained galaxy', () => {
 test('observer highlights cross systems and keep the requested playback time', () => {
   const { track } = index;
   assert.ok(new Set(track.map((h) => h.e.site)).size > 5);
-  for (const category of ['Battle', 'Science', 'Diplomacy']) {
+  for (const category of ['Conflict', 'Science', 'Diplomacy']) {
     assert.ok(track.some((h) => h.category === category));
   }
   const opening = header(index).openingHighlight;
   assert.ok(opening);
-  const beat = track.find((h) => h.category === 'Battle' && h.t < cfg.years * 12);
+  const beat = track.find((h) => h.category === 'Conflict' && h.t < cfg.years * 12);
   const before = frame(index, { month: beat.t - 1, site: 0 });
   assert.equal(before.nextHighlight, beat.t);
   const after = frame(index, { month: beat.t + 1, followFrom: before.t, site: 0 });
   assert.equal(after.t, beat.t + 1);
   assert.equal(after.highlight.id, beat.e.id);
   assert.equal(after.selected, beat.e.site);
-  assert.deepEqual(after.highlight.battle.strength, beat.e.combat);
+  assert.deepEqual(after.highlight.combat, beat.e.combat);
   assert.ok(beat.e.combat.attack > 0 && beat.e.combat.defense >= 0);
-  assert.equal(after.highlight.battle.captured, beat.e.title === 'Control transferred');
   const manual = frame(index, { month: beat.t, site: 0 });
   assert.equal(manual.selected, 0);
   const receiver = (beat.e.site + 1) % cfg.systems;
@@ -138,8 +145,25 @@ test('observer highlights cross systems and keep the requested playback time', (
   assert.equal(local.selected, receiver);
   assert.equal(local.currentEvent, null);
   assert.ok(!local.highlight || local.highlight.site === receiver);
-  const archived = indexReplay({ ...replay, events: replay.events.map(({ combat, ...e }) => e) });
-  const olderBattle = frame(archived, { month: beat.t, site: beat.e.site, event: beat.e.id });
-  assert.equal(olderBattle.highlight.battle.captured, after.highlight.battle.captured);
-  assert.equal(olderBattle.highlight.battle.strength, null);
+  const archived = indexReplay({
+    ...replay,
+    chart: replay.chart.map(({ z, ...s }) => s),
+    events: replay.events.map(({ combat, ...e }) => e),
+  });
+  const oldFrame = frame(archived, { month: beat.t, site: beat.e.site, event: beat.e.id });
+  assert.equal(oldFrame.highlight.title, after.highlight.title);
+  assert.ok(oldFrame.systems.every((s) => s.z === 0));
+});
+
+test('news tracks the timeline and respects the local receiver', () => {
+  const month = cfg.years * 12;
+  const galaxy = frame(index, { month });
+  assert.deepEqual(galaxy.news.map((e) => e.id), index.salient.slice(-24).reverse().map((e) => e.id));
+  assert.ok(new Set(galaxy.news.map((e) => e.site)).size > 1);
+  assert.ok(galaxy.systems.every((s) => s.z === replay.chart[s.id].z));
+  const first = index.localNews[0][0];
+  assert.equal(frame(index, { month: first.t - 1, lens: 0 }).news.length, 0);
+  const local = frame(index, { month: first.t, lens: 0, site: 1 });
+  assert.ok(local.news.some((e) => e.id === first.id));
+  assert.ok(local.news.every((e) => e.site === 0 && e.t <= first.t));
 });

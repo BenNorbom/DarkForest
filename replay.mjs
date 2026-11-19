@@ -9,12 +9,12 @@ const lastIndex = (rows, t, field = 't') => {
   return lo - 1;
 };
 const latest = (rows, t) => rows[lastIndex(rows, t)];
-const isBattle = (e) =>
+const isContest = (e) =>
   e?.kind === 'conflict' && ['Control transferred', 'Expedition repelled'].includes(e.title);
 const isPassage = (e) => e.kind === 'report' && e.title.startsWith('Passage offer · ');
 const isForeignTrade = (e) => e.kind === 'trade' && e.actor != null && e.actor !== e.previous;
 const localPriority = (e) =>
-  isBattle(e) ? 4 : e.kind === 'discovery' || isPassage(e) ? 3 : e.first ? 1 : 2;
+  isContest(e) ? 4 : e.kind === 'discovery' || isPassage(e) ? 3 : e.first ? 1 : 2;
 
 function highlightTrack(run) {
   const candidates = [],
@@ -22,8 +22,8 @@ function highlightTrack(run) {
     exchanges = new Set();
   for (const e of run.events) {
     let category, weight;
-    if (isBattle(e)) {
-      category = 'Battle';
+    if (isContest(e)) {
+      category = 'Conflict';
       weight = (e.title === 'Control transferred' ? 76 : 66) + (run.chart[e.site].home ? 9 : 0);
       weight += Math.min(18, ((e.combat?.attack ?? 0) + (e.combat?.defense ?? 0)) / 5);
     } else if (e.kind === 'discovery') {
@@ -67,24 +67,12 @@ function highlightTrack(run) {
 
 function describeHighlight(run, e, category) {
   if (!e) return null;
-  const party = (id) => {
-    const c = run.civs[id];
-    return c ? { name: c.name, color: c.color } : null;
-  };
-  const battle = isBattle(e)
-    ? {
-        attacker: party(e.actor),
-        defender: party(e.previous),
-        captured: e.title === 'Control transferred',
-        strength: e.combat ?? null,
-      }
-    : null;
   return {
     ...e,
     category:
       category ??
-      (battle
-        ? 'Battle'
+      (e.kind === 'conflict'
+        ? 'Conflict'
         : e.kind === 'discovery'
           ? 'Science'
           : isPassage(e) || e.kind === 'trade'
@@ -96,9 +84,6 @@ function describeHighlight(run, e, category) {
                 : 'Intelligence'),
     system: run.chart[e.site].name,
     originSystem: run.chart[e.target]?.name,
-    faction: party(e.owner)?.name,
-    other: party(isPassage(e) ? e.report?.owner : e.actor)?.name,
-    battle,
   };
 }
 
@@ -109,6 +94,7 @@ export function indexReplay(run) {
   const decision = new Map(),
     salient = [],
     localBeats = run.chart.map(() => []),
+    localNews = run.chart.map(() => []),
     globalLog = [];
   for (const e of run.events) {
     bySite[e.site].push(e);
@@ -120,6 +106,12 @@ export function indexReplay(run) {
     const major =
       ['conflict', 'colony', 'collapse', 'discovery', 'trade'].includes(e.kind) || isPassage(e);
     if (major || e.first) localBeats[e.site].push(e);
+    if (
+      major || e.first || e.kind === 'receipt' ||
+      (e.kind === 'report' && /mission report|Survey return/.test(e.title)) ||
+      ['Relief convoy arrived', 'Convoy recalled'].includes(e.title)
+    )
+      localNews[e.site].push(e);
     if (major) salient.push(e);
     if (e.kind !== 'report' || e.first) globalLog.push(e);
   }
@@ -136,6 +128,7 @@ export function indexReplay(run) {
     decision,
     salient,
     localBeats,
+    localNews,
     globalLog,
     maxFlight,
     track: highlightTrack(run),
@@ -166,7 +159,7 @@ export function header(idx) {
     ) ?? idx.bySite[0].find((e) => e.t >= 48 && e.kind === 'order');
   const upcoming = lastIndex(idx.track, opening?.t ?? 0) + 1;
   const openingHighlight =
-    idx.track.slice(upcoming, upcoming + 4).find((h) => h.category === 'Battle') ??
+    idx.track.slice(upcoming, upcoming + 4).find((h) => h.category === 'Conflict') ??
     idx.track[upcoming] ??
     idx.track.at(-1);
   return {
@@ -221,9 +214,9 @@ export function frame(idx, { month = 0, site = 0, lens = -1, event = -1, followF
       };
     return { owner: null, known: false, stale: 0, home: false };
   });
-  const systems = r.chart.map(({ id, x, y, name }, i) => {
+  const systems = r.chart.map(({ id, x, y, z = 0, name }, i) => {
     const { owner, known, stale, home } = info[i];
-    return { id, x, y, name, owner, known, stale, home, color: r.civs[owner]?.color };
+    return { id, x, y, z, name, owner, known, stale, home, color: r.civs[owner]?.color };
   });
   const active = [];
   for (let i = lastIndex(r.flights, t, 'start'); i >= 0; i--) {
@@ -282,6 +275,8 @@ export function frame(idx, { month = 0, site = 0, lens = -1, event = -1, followF
       model: lens < 0 || site === lens ? civ?.model : null,
     },
     feed,
+    news: pickRecent(lens < 0 ? idx.salient : idx.localNews[lens], t, 24, canSee)
+      .map((e) => describeHighlight(r, e)),
     decision: visibleDecision,
     nextBeat: next,
     nextHighlight,

@@ -39,7 +39,6 @@ const assets = new Map(
     '/app.js': 'app.js',
     '/observatory.css': 'observatory.css',
     '/starfield.js': 'starfield.js',
-    '/battle.js': 'battle.js',
     '/balance-report.json': 'balance-report.json',
   }),
 );

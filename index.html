@@ -15,13 +15,13 @@
         color: #bde996;
       }
       .map-head h2 {
-        font-size: clamp(1.8rem, 3.2vw, 2.75rem);
+        font-size: clamp(1.45rem, 2.4vw, 2rem);
         font-weight: 520;
         letter-spacing: -0.05em;
       }
       .map-head {
         align-items: center;
-        min-height: 76px;
+        padding-bottom: 0.6rem;
       }
       .map-frame {
         border-radius: 6px;
@@ -79,9 +79,6 @@
         font: 0.79rem var(--mono);
         margin-top: 0.38rem;
         flex-wrap: wrap;
-      }
-      .inspector {
-        margin-top: 8px;
       }
       .inspector .facts {
         font-size: 0.85rem;
@@ -266,10 +263,6 @@
           display: none;
         }
       }
-      .map-frame {
-        height: clamp(355px, calc(100svh - 415px), 780px);
-        min-height: 355px;
-      }
       .map-overlay #routeBrief {
         max-width: 30rem;
         color: #cfdfae;
@@ -277,26 +270,7 @@
       .map-context .status-dot {
         flex-shrink: 0;
       }
-      @media (max-height: 820px) and (min-width: 761px) {
-        .topbar {
-          min-height: 60px;
-        }
-        .shell {
-          padding-top: 14px;
-        }
-        .map-head {
-          min-height: 66px;
-        }
-        .map-frame {
-          height: calc(100svh - 365px);
-          min-height: 310px;
-        }
-      }
       @media (max-width: 760px) {
-        .map-frame {
-          height: 47svh;
-          min-height: 330px;
-        }
         .topbar .tabs {
           overflow-x: auto;
         }
@@ -307,285 +281,264 @@
     </style>
   </head>
   <body>
-    <header class="topbar">
-      <div class="brand">
-        <span class="brandmark" aria-hidden="true"></span>
-        <div>
-          <h1>Dark Forest</h1>
-          <small>STRATEGIC OBSERVATORY</small>
-        </div>
-      </div>
-      <nav class="tabs" aria-label="Workspace">
-        <button class="tab active" data-tab="observatory">Observatory</button
-        ><button class="tab" data-tab="chronicle">Chronicle</button
-        ><button class="tab" data-tab="lineages">Lineages</button
-        ><button class="tab" data-tab="guide">Field guide</button>
-      </nav>
-      <button class="primary" id="newRun">New run</button>
-    </header>
-    <main class="shell">
-      <section class="workspace" id="workspace">
-        <div class="map-head">
+    <div id="theater">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brandmark" aria-hidden="true"></span>
           <div>
-            <span class="section-label">Galactic theater</span>
-            <h2 id="runTitle">The Vesper Passage</h2>
-            <div class="run-summary" id="runSummary">Preparing the star chart…</div>
-          </div>
-          <div class="map-tools">
-            <label for="lens">Perspective</label
-            ><select id="lens">
-              <option value="-1">Galaxy overview</option>
-              <option value="local">Local intelligence</option>
-            </select>
-            <label class="follow-toggle"
-              ><input id="followAction" type="checkbox" checked /> Follow action</label
-            >
-            <button id="fullscreenMap" aria-pressed="false">Fullscreen</button>
+            <h1>Dark Forest</h1>
+            <small>STRATEGIC OBSERVATORY</small>
           </div>
         </div>
-        <div class="map-frame">
-          <canvas
-            id="sky"
-            tabindex="0"
-            aria-label="Galaxy map. Use arrow keys to pan, plus and minus to zoom, and Enter to select the central system. Use the system selector for a list."
-          ></canvas>
-          <div class="map-overlay">
-            <div class="map-context">
-              <i class="status-dot"></i><strong id="mapLabel">SECTOR MAP</strong>
+        <nav class="tabs" aria-label="Workspace">
+          <button class="tab active" data-tab="observatory">Observatory</button
+          ><button class="tab" data-tab="chronicle">Chronicle</button
+          ><button class="tab" data-tab="lineages">Lineages</button
+          ><button class="tab" data-tab="guide">Field guide</button>
+        </nav>
+        <button class="primary" id="newRun">New run</button>
+      </header>
+      <main class="shell">
+        <section class="workspace" id="workspace">
+          <div class="map-head">
+            <div>
+              <h2 id="runTitle">The Vesper Passage</h2>
+              <div class="run-summary" id="runSummary">Preparing the star chart…</div>
             </div>
-            <small id="mapSub">Loading the sector record…</small><small id="routeBrief" hidden></small>
-          </div>
-          <div class="map-legend">
-            <span><i class="legend-home"></i> Home system</span
-            ><span><i class="legend-fleet"></i> Fleet</span
-            ><span><i class="legend-signal"></i> Signal</span>
-          </div>
-          <div class="map-buttons">
-            <button id="zoomOut" aria-label="Zoom out">−</button
-            ><button id="zoomIn" aria-label="Zoom in">+</button
-            ><button id="fitMap" aria-label="Fit galaxy">Fit</button>
-          </div>
-          <article id="spotlight" class="spotlight" hidden aria-label="Current highlight">
-            <div class="spotlight-kicker" id="highlightContext"></div>
-            <h3 id="highlightTitle"></h3>
-            <p id="highlightBody"></p>
-            <button id="watchBattle" hidden>Watch 3D battle</button>
-          </article>
-          <section class="battle-stage" id="battleStage" hidden aria-label="3D battle replay">
-            <canvas
-              id="battleCanvas"
-              tabindex="0"
-              aria-label="3D view of fleet formations. Drag or use the arrow keys to orbit."
-            ></canvas>
-            <header class="battle-heading">
-              <span class="section-label">Battle replay</span>
-              <h3 id="battleTitle"></h3>
-              <span id="battleDate" class="battle-date"></span>
-            </header>
-            <button id="closeBattle">Back to map</button>
-            <div class="battle-factions">
-              <div class="battle-side" id="attackSide">
-                <small>Expedition</small><strong id="attackName"></strong
-                ><span id="attackStrength"></span>
-              </div>
-              <div class="battle-side" id="defenseSide">
-                <small>Garrison</small><strong id="defenseName"></strong
-                ><span id="defenseStrength"></span>
-              </div>
-            </div>
-            <footer class="battle-footer">
-              <div>
-                <strong id="battlePhase"></strong>
-                <small>Illustrative formations · Drag to orbit</small>
-              </div>
-              <button id="battleToggle">Pause replay</button>
-              <progress
-                id="battleProgress"
-                aria-label="Battle replay progress"
-                max="1"
-                value="0"
-              ></progress>
-            </footer>
-          </section>
-        </div>
-        <section class="transport" aria-label="Playback controls">
-          <div class="transport-head">
-            <div class="clockline">
-              <span class="eyebrow">Simulation time</span
-              ><strong class="clock" id="clock">Year 0</strong>
-            </div>
-            <div class="speed-tools">
-              <select id="mode" aria-label="Playback mode">
-                <option>Guided</option>
-                <option>Fixed</option></select
-              ><select id="speed" aria-label="Playback speed">
-                <option value=".25">0.25 yr/s</option>
-                <option value="1">1 yr/s</option>
-                <option value="5" selected>5 yr/s</option>
-                <option value="25">25 yr/s</option>
-                <option value="100">100 yr/s</option>
+            <div class="map-tools">
+              <label for="lens">Perspective</label
+              ><select id="lens">
+                <option value="-1">Galaxy overview</option>
+                <option value="local">Local intelligence</option>
               </select>
+              <label class="follow-toggle"
+                ><input id="followAction" type="checkbox" /> Follow action</label
+              >
+              <button id="fullscreenMap" aria-pressed="false">Fullscreen</button>
             </div>
           </div>
-          <div class="timeline-rail">
-            <input
-              id="timeline"
-              type="range"
-              min="0"
-              max="2160"
-              value="0"
-              aria-label="Simulation month"
-            />
-            <div class="timeline-ends"><span>Year 0</span><span id="endTime">Year 180</span></div>
+          <div class="map-frame">
+            <canvas
+              id="sky"
+              tabindex="0"
+              aria-label="3D galaxy map. Drag or use the arrow keys to orbit. Hold Shift to pan. Use plus and minus to zoom, Home to fit, and Enter to select the central system."
+            ></canvas>
+            <div class="map-overlay">
+              <div class="map-context">
+                <i class="status-dot"></i><strong id="mapLabel">3D STAR MAP</strong>
+              </div>
+              <small id="mapSub">Loading the sector record…</small><small id="routeBrief" hidden></small>
+            </div>
+            <span class="orbit-hint">Drag to orbit <span>· Shift + drag to pan</span></span>
+            <div class="map-legend">
+              <span><i class="legend-home"></i> Home system</span
+              ><span><i class="legend-fleet"></i> Fleet</span
+              ><span><i class="legend-signal"></i> Signal</span>
+            </div>
+            <div class="map-buttons">
+              <button id="zoomOut" aria-label="Zoom out">−</button
+              ><button id="zoomIn" aria-label="Zoom in">+</button
+              ><button id="fitMap" aria-label="Fit galaxy">Fit</button>
+            </div>
           </div>
-          <div class="transport-actions">
-            <button class="primary" id="play">▶ Play</button><button id="step">+1 month</button
-            ><button id="nextBeat">Next highlight</button
-            ><small class="clock-status" id="status" role="status">Generating replay…</small>
-          </div>
+          <section class="transport" aria-label="Playback controls">
+            <div class="transport-head">
+              <div class="clockline">
+                <span class="eyebrow">Simulation time</span
+                ><strong class="clock" id="clock">Year 0</strong>
+              </div>
+              <div class="speed-tools">
+                <select id="mode" aria-label="Playback mode">
+                  <option>Guided</option>
+                  <option selected>Fixed</option></select
+                ><select id="speed" aria-label="Playback speed">
+                  <option value=".25">0.25 yr/s</option>
+                  <option value="1">1 yr/s</option>
+                  <option value="5" selected>5 yr/s</option>
+                  <option value="25">25 yr/s</option>
+                  <option value="100">100 yr/s</option>
+                </select>
+              </div>
+            </div>
+            <div class="timeline-rail">
+              <input
+                id="timeline"
+                type="range"
+                min="0"
+                max="2160"
+                value="0"
+                aria-label="Simulation month"
+              />
+              <div class="timeline-ends"><span>Year 0</span><span id="endTime">Year 180</span></div>
+            </div>
+            <div class="transport-actions">
+              <button class="primary" id="play">▶ Play</button><button id="step">+1 month</button
+              ><button id="nextBeat">Next event</button
+              ><small class="clock-status" id="status" role="status">Generating replay…</small>
+            </div>
+          </section>
+          <p id="notice" role="alert" hidden></p>
         </section>
-        <p id="notice" role="alert" hidden></p>
-      </section>
-      <aside class="inspector" id="inspector">
-        <div class="inspector-head">
-          <span class="section-label">System intelligence</span>
-          <h2 id="sysTitle">Vesper</h2>
-          <small class="muted" id="faction">Awaiting telemetry</small>
-        </div>
-        <label class="screen-reader" for="siteSelect">Inspect system</label
-        ><select id="siteSelect"></select>
-        <div class="readout-grid" id="readouts"></div>
-        <div class="facts" id="siteFacts"></div>
-        <div class="sectionline">
-          <h3>Latest order</h3>
-          <span class="tag" id="policyLabel"></span>
-        </div>
-        <div class="inspect-action" id="latestOrder"></div>
-        <div class="sectionline">
-          <h3>Local record</h3>
-          <button id="allEvents">View log</button>
-        </div>
-        <div class="event-list compact" id="feed"></div>
-      </aside>
-      <section class="comparison" id="comparison" hidden>
-        <span class="section-label">Counterfactual replay</span>
-        <h2>Original and alternate</h2>
-        <div id="compareBody"></div>
-        <div class="toolbar">
-          <button id="switchBranch">Open original</button
-          ><button id="compareEvidence">Compare received evidence</button>
-        </div>
-      </section>
-      <section class="view-panel" id="chroniclePanel" hidden>
-        <span class="section-label">Run archive</span>
-        <div class="row">
-          <h2>Chronicle</h2>
-          <div class="toolbar">
-            <select id="logScope" aria-label="Event scope">
-              <option value="region">Selected system</option>
-              <option value="all">Entire galaxy</option></select
-            ><select id="logFilter" aria-label="Event type">
-              <option value="major">Turning points</option>
-              <option value="all">All entries</option>
-              <option value="order">Orders</option>
-              <option value="report">Reports</option>
-              <option value="conflict">Contests</option>
-              <option value="trade">Trade</option>
-              <option value="colony">Colonies</option>
-              <option value="discovery">Discoveries</option>
-            </select>
+        <aside class="dock" id="dock" aria-label="Observatory sidebar">
+          <div class="observatory-panel" id="observatoryPanel">
+            <details class="inspector" id="inspector">
+              <summary>System intelligence</summary>
+              <div class="inspector-head">
+                <h2 id="sysTitle">Vesper</h2>
+                <small class="muted" id="faction">Awaiting telemetry</small>
+              </div>
+              <label class="screen-reader" for="siteSelect">Inspect system</label
+              ><select id="siteSelect"></select>
+              <div class="readout-grid" id="readouts"></div>
+              <div class="facts" id="siteFacts"></div>
+              <div class="sectionline">
+                <h3>Latest order</h3>
+                <span class="tag" id="policyLabel"></span>
+              </div>
+              <div class="inspect-action" id="latestOrder"></div>
+              <div class="sectionline">
+                <h3>Local record</h3>
+                <button id="allEvents">View log</button>
+              </div>
+              <div class="event-list compact" id="feed"></div>
+              <section class="comparison" id="comparison" hidden>
+                <span class="section-label">Counterfactual replay</span>
+                <h2>Original and alternate</h2>
+                <div id="compareBody"></div>
+                <div class="toolbar">
+                  <button id="switchBranch">Open original</button
+                  ><button id="compareEvidence">Compare received evidence</button>
+                </div>
+              </section>
+            </details>
+            <section class="news" aria-labelledby="newsTitle">
+              <header class="news-head">
+                <div>
+                  <h2 id="newsTitle">News feed</h2>
+                  <p id="newsScope">Galaxy overview</p>
+                </div>
+                <button id="newsArchive">Chronicle</button>
+              </header>
+              <div class="news-feed" id="newsFeed" role="region" aria-label="Recent news" tabindex="0">
+                <p class="minor news-empty">Waiting for the first reports…</p>
+              </div>
+            </section>
           </div>
+          <section class="view-panel" id="chroniclePanel" hidden>
+            <span class="section-label">Run archive</span>
+            <div class="row">
+              <h2>Chronicle</h2>
+              <div class="toolbar">
+                <select id="logScope" aria-label="Event scope">
+                  <option value="region">Selected system</option>
+                  <option value="all">Entire galaxy</option></select
+                ><select id="logFilter" aria-label="Event type">
+                  <option value="major">Turning points</option>
+                  <option value="all">All entries</option>
+                  <option value="order">Orders</option>
+                  <option value="report">Reports</option>
+                  <option value="conflict">Contests</option>
+                  <option value="trade">Trade</option>
+                  <option value="colony">Colonies</option>
+                  <option value="discovery">Discoveries</option>
+                </select>
+              </div>
+            </div>
+            <p id="logCaption"></p>
+            <div id="logRows" class="event-list"></div>
+            <div class="toolbar"><button id="logBack">Newer</button><button id="logMore">Older</button></div>
+          </section>
+          <section class="view-panel" id="ledgerPanel" hidden>
+            <span class="section-label">Survival census</span>
+            <h2>Lineages</h2>
+            <div id="ledgerBody"></div>
+          </section>
+          <section class="view-panel" id="guidePanel" hidden>
+            <span class="section-label">Observer reference</span>
+            <h2>Field guide</h2>
+            <div class="guide-grid">
+              <section>
+                <h3>Read a delayed sky</h3>
+                <p>
+                  A launch six light-years away becomes visible at the earliest in year 6. A fast expedition
+                  arrives in year 18. A question sent when the launch is first detected can receive an
+                  immediate reply exactly as the expedition arrives.
+                </p>
+                <p>
+                  Select a system and switch to Local intelligence to see its received reports. Hollow
+                  contacts carry older evidence. Industrial traces estimate population and strength. Survey
+                  returns can identify technology.
+                </p>
+              </section>
+              <section>
+                <h3>Survival under pressure</h3>
+                <p>
+                  Older production sites yield less supply. Garrison upkeep draws on the same stores that
+                  support the population. A viable refuge has maintained renewable local supply and a year of
+                  reserves for five years. A lineage can persist under foreign control.
+                </p>
+                <p>
+                  Industrial and launch signatures propagate outward. Periodic deep-sky observations can
+                  expose a quiet system. A distant colony needs its own intelligence and reserve.
+                </p>
+              </section>
+              <section>
+                <h3>Trade and contested sites</h3>
+                <p>
+                  Fast expeditions travel at one-third light speed. Survey craft inspect sites, settlement
+                  craft carry residents, and military expeditions commit most of their local garrison.
+                  Attackers need a 25% local strength advantage to take an occupied site.
+                </p>
+                <p>
+                  Complementary goods earn more when local demand is fresh. Passage offers, successful
+                  exchanges, and prior conflicts influence future dealings. A trade return takes the full
+                  freight travel time.
+                </p>
+              </section>
+              <section>
+                <h3>Research and adaptation</h3>
+                <p>
+                  Local research draws hidden breakthrough thresholds. Long-endurance drives extend practical
+                  reach, compact habitats reduce colony cost, interferometry improves passive sensing, and
+                  autonomous fabrication increases local supply.
+                </p>
+                <p>
+                  Six pretrained policies compete for lineage survival. Each controller keeps its own
+                  history. A delivered success or failure changes its preference for that action and
+                  destination, and the effect fades as evidence ages.
+                </p>
+              </section>
+              <section>
+                <h3>Watch a decision unfold</h3>
+                <p>
+                  Drag to orbit the 3D chart, Shift-drag to pan, and scroll to zoom. The news feed follows
+                  the timeline. Local intelligence shows news available to the selected receiver. Click a
+                  headline to read the event and jump to its date.
+                </p>
+                <p>
+                  Enable Follow action to move the camera to highlights such as contests, breakthroughs, and
+                  diplomatic events. Guided playback slows around highlights. Fixed playback uses the selected pace.
+                </p>
+                <p>
+                  Inspect an order to see the available alternatives. Replacing one order creates an archived
+                  branch. Both timelines share the same starting world and research draws.
+                </p>
+              </section>
+              <section>
+                <h3>Pretraining trials</h3>
+                <div id="trainingReport"><p>Loading evaluation…</p></div>
+              </section>
+            </div>
+          </section>
+        </aside>
+      </main>
+      <dialog id="dialog" class="dialog">
+        <div class="dialog-card">
+          <button id="closeDialog" class="close" aria-label="Close dialog">×</button>
+          <div id="dialogBody"></div>
         </div>
-        <p id="logCaption"></p>
-        <div id="logRows" class="event-list"></div>
-        <div class="toolbar"><button id="logBack">Newer</button><button id="logMore">Older</button></div>
-      </section>
-      <section class="view-panel" id="ledgerPanel" hidden>
-        <span class="section-label">Survival census</span>
-        <h2>Lineages</h2>
-        <div id="ledgerBody"></div>
-      </section>
-      <section class="view-panel" id="guidePanel" hidden>
-        <span class="section-label">Observer reference</span>
-        <h2>Field guide</h2>
-        <div class="guide-grid">
-          <section>
-            <h3>Read a delayed sky</h3>
-            <p>
-              A launch six light-years away becomes visible at the earliest in year 6. A fast expedition
-              arrives in year 18. A question sent when the launch is first detected can receive an
-              immediate reply exactly as the expedition arrives.
-            </p>
-            <p>
-              Select a system and switch to Local intelligence to see its received reports. Hollow
-              contacts carry older evidence. Industrial traces estimate population and strength. Survey
-              returns can identify technology.
-            </p>
-          </section>
-          <section>
-            <h3>Survival under pressure</h3>
-            <p>
-              Older production sites yield less supply. Garrison upkeep draws on the same stores that
-              support the population. A viable refuge has maintained renewable local supply and a year of
-              reserves for five years. A lineage can persist under foreign control.
-            </p>
-            <p>
-              Industrial and launch signatures propagate outward. Periodic deep-sky observations can
-              expose a quiet system. A distant colony needs its own intelligence and reserve.
-            </p>
-          </section>
-          <section>
-            <h3>Trade and contested sites</h3>
-            <p>
-              Fast expeditions travel at one-third light speed. Survey craft inspect sites, settlement
-              craft carry residents, and military expeditions commit most of their local garrison.
-              Attackers need a 25% local strength advantage to take an occupied site.
-            </p>
-            <p>
-              Complementary goods earn more when local demand is fresh. Passage offers, successful
-              exchanges, and prior conflicts influence future dealings. A trade return takes the full
-              freight travel time.
-            </p>
-          </section>
-          <section>
-            <h3>Research and adaptation</h3>
-            <p>
-              Local research draws hidden breakthrough thresholds. Long-endurance drives extend practical
-              reach, compact habitats reduce colony cost, interferometry improves passive sensing, and
-              autonomous fabrication increases local supply.
-            </p>
-            <p>
-              Six pretrained policies compete for lineage survival. Each controller keeps its own
-              history. A delivered success or failure changes its preference for that action and
-              destination, and the effect fades as evidence ages.
-            </p>
-          </section>
-          <section>
-            <h3>Watch a decision unfold</h3>
-            <p>
-              Follow action moves the camera to selected battles, breakthroughs, and diplomatic events.
-              Guided playback slows the clock around highlights. The timeline keeps moving through battle
-              replays. Fixed playback uses the selected pace. Local intelligence highlights only events
-              available to the selected receiver. Click a record to inspect its evidence and date.
-            </p>
-            <p>
-              Inspect an order to see the available alternatives. Replacing one order creates an archived
-              branch. Both timelines share the same starting world and research draws.
-            </p>
-          </section>
-          <section>
-            <h3>Pretraining trials</h3>
-            <div id="trainingReport"><p>Loading evaluation…</p></div>
-          </section>
-        </div>
-      </section>
-    </main>
-    <dialog id="dialog" class="dialog">
-      <div class="dialog-card">
-        <button id="closeDialog" class="close" aria-label="Close dialog">×</button>
-        <div id="dialogBody"></div>
-      </div>
-    </dialog>
+      </dialog>
+    </div>
     <script type="module" src="/app.js"></script>
   </body>
 </html>

@@ -1,7 +1,7 @@
 {
   "version": 2,
   "ruleset": "lineage-crossplay-2",
-  "simulatorVersion": "parallax-1",
+  "simulatorVersion": "parallax-2",
   "evaluationRollouts": 408,
   "independentSeeds": 24,
   "horizonYears": 160,
@@ -9,126 +9,126 @@
   "fitness": "4 × surviving lineage + 6 × viable community + bounded population and viable-refuge resilience (0–1). Extinct lineages score zero.",
   "crossplay": {
     "pretrained": {
-      "alive": 0.8125,
+      "alive": 0.7083,
       "viable": 0.4375,
-      "fitness": 6.2621,
-      "population": 75.0375,
-      "settlements": 1.6458,
-      "attacks": 14.3125,
-      "trades": 6.1667,
-      "colonies": 4.6458,
-      "losses": 4.125
+      "fitness": 5.846,
+      "population": 73.0292,
+      "settlements": 1.7708,
+      "attacks": 10.8542,
+      "trades": 4.1458,
+      "colonies": 4.4792,
+      "losses": 3.375
     },
     "initial": {
       "alive": 0.4792,
-      "viable": 0.375,
-      "fitness": 4.4256,
-      "population": 39.6583,
-      "settlements": 1.8542,
-      "attacks": 7.5208,
-      "trades": 2.0208,
-      "colonies": 1.6042,
-      "losses": 1.7917,
+      "viable": 0.3333,
+      "fitness": 4.1805,
+      "population": 47.9458,
+      "settlements": 1.8958,
+      "attacks": 6.5625,
+      "trades": 1.4583,
+      "colonies": 1.5417,
+      "losses": 1.2083,
       "pairedFitnessAdvantageOfTrained": {
-        "mean": 1.8365,
-        "lower95": 0.0726,
-        "upper95": 3.4828
+        "mean": 1.6656,
+        "lower95": 0.0096,
+        "upper95": 3.3677
       }
     },
     "random": {
-      "alive": 0.5833,
-      "viable": 0.375,
-      "fitness": 4.8659,
-      "population": 50.275,
-      "settlements": 1.2083,
-      "attacks": 3.8333,
-      "trades": 3.1458,
-      "colonies": 2.4375,
-      "losses": 2.6875,
+      "alive": 0.625,
+      "viable": 0.4583,
+      "fitness": 5.5619,
+      "population": 50.3125,
+      "settlements": 1.3125,
+      "attacks": 3.75,
+      "trades": 2.1667,
+      "colonies": 2.3125,
+      "losses": 2,
       "pairedFitnessAdvantageOfTrained": {
-        "mean": 1.3962,
-        "lower95": -0.1675,
-        "upper95": 2.931
+        "mean": 0.2841,
+        "lower95": -1.2007,
+        "upper95": 1.7104
       }
     },
     "turtle": {
       "alive": 0.0625,
       "viable": 0,
-      "fitness": 0.2607,
-      "population": 0.9229,
-      "settlements": 0.0417,
+      "fitness": 0.2606,
+      "population": 0.8729,
+      "settlements": 0.0625,
       "attacks": 0,
       "trades": 0,
       "colonies": 0,
-      "losses": 0.25,
+      "losses": 0.2083,
       "pairedFitnessAdvantageOfTrained": {
-        "mean": 6.0014,
-        "lower95": 4.8819,
-        "upper95": 7.1686
+        "mean": 5.5854,
+        "lower95": 4.4371,
+        "upper95": 6.7347
       }
     },
     "fortress": {
       "alive": 0.1875,
       "viable": 0,
-      "fitness": 0.79,
-      "population": 6.2979,
+      "fitness": 0.7904,
+      "population": 6.5104,
       "settlements": 0.1458,
       "attacks": 0,
       "trades": 0,
       "colonies": 0,
-      "losses": 0.25,
+      "losses": 0.1875,
       "pairedFitnessAdvantageOfTrained": {
-        "mean": 5.472,
-        "lower95": 4.2836,
-        "upper95": 6.7351
+        "mean": 5.0557,
+        "lower95": 3.7895,
+        "upper95": 6.3211
       }
     },
     "raider": {
       "alive": 0.2917,
-      "viable": 0.0417,
-      "fitness": 1.4706,
-      "population": 3.4417,
-      "settlements": 0.875,
-      "attacks": 20.5,
+      "viable": 0.0625,
+      "fitness": 1.5978,
+      "population": 3.2458,
+      "settlements": 0.6875,
+      "attacks": 12.1458,
       "trades": 0,
       "colonies": 0,
-      "losses": 2.1458,
+      "losses": 1.1875,
       "pairedFitnessAdvantageOfTrained": {
-        "mean": 4.7914,
-        "lower95": 3.6795,
-        "upper95": 5.9952
+        "mean": 4.2482,
+        "lower95": 3.0088,
+        "upper95": 5.4513
       }
     },
     "trader": {
       "alive": 0.0625,
       "viable": 0,
-      "fitness": 0.2619,
-      "population": 1.3354,
+      "fitness": 0.2609,
+      "population": 0.9521,
       "settlements": 0.0625,
       "attacks": 0,
-      "trades": 6.75,
+      "trades": 3.1458,
       "colonies": 0,
-      "losses": 0.3333,
+      "losses": 0.2083,
       "pairedFitnessAdvantageOfTrained": {
-        "mean": 6.0002,
-        "lower95": 4.88,
-        "upper95": 7.1662
+        "mean": 5.5851,
+        "lower95": 4.437,
+        "upper95": 6.7346
       }
     },
     "disperser": {
-      "alive": 0.3958,
-      "viable": 0.2292,
-      "fitness": 3.1117,
-      "population": 12.5958,
-      "settlements": 0.4167,
-      "attacks": 0,
+      "alive": 0.375,
+      "viable": 0.25,
+      "fitness": 3.1435,
+      "population": 10.2062,
+      "settlements": 0.375,
+      "attacks": 0.0208,
       "trades": 0,
-      "colonies": 5.3958,
-      "losses": 0.3958,
+      "colonies": 4.9167,
+      "losses": 0.125,
       "pairedFitnessAdvantageOfTrained": {
-        "mean": 3.1504,
-        "lower95": 1.6976,
-        "upper95": 4.6117
+        "mean": 2.7025,
+        "lower95": 1.2443,
+        "upper95": 4.0892
       }
     }
   },
@@ -137,241 +137,241 @@
       "seed": 3619009,
       "years": 160,
       "civilizations": 6,
-      "attacks": 139,
-      "trades": 59,
-      "colonies": 20,
-      "alive": 4,
-      "viable": 4
+      "attacks": 62,
+      "trades": 27,
+      "colonies": 18,
+      "alive": 5,
+      "viable": 3
     },
     {
       "seed": 3619280,
       "years": 160,
       "civilizations": 6,
-      "attacks": 123,
-      "trades": 16,
-      "colonies": 18,
-      "alive": 6,
-      "viable": 2
+      "attacks": 103,
+      "trades": 15,
+      "colonies": 19,
+      "alive": 5,
+      "viable": 4
     },
     {
       "seed": 3619551,
       "years": 160,
       "civilizations": 6,
-      "attacks": 105,
-      "trades": 16,
-      "colonies": 20,
-      "alive": 5,
-      "viable": 1
+      "attacks": 107,
+      "trades": 13,
+      "colonies": 17,
+      "alive": 6,
+      "viable": 3
     },
     {
       "seed": 3619822,
       "years": 160,
       "civilizations": 6,
-      "attacks": 108,
-      "trades": 47,
-      "colonies": 23,
-      "alive": 5,
+      "attacks": 98,
+      "trades": 27,
+      "colonies": 20,
+      "alive": 6,
       "viable": 4
     },
     {
       "seed": 3620093,
       "years": 160,
       "civilizations": 6,
-      "attacks": 86,
-      "trades": 33,
-      "colonies": 16,
-      "alive": 3,
-      "viable": 2
+      "attacks": 74,
+      "trades": 35,
+      "colonies": 23,
+      "alive": 5,
+      "viable": 3
     },
     {
       "seed": 3620364,
       "years": 160,
       "civilizations": 6,
-      "attacks": 131,
-      "trades": 33,
-      "colonies": 18,
-      "alive": 5,
+      "attacks": 109,
+      "trades": 37,
+      "colonies": 20,
+      "alive": 6,
       "viable": 2
     },
     {
       "seed": 3620635,
       "years": 160,
       "civilizations": 6,
-      "attacks": 41,
-      "trades": 59,
-      "colonies": 20,
-      "alive": 4,
+      "attacks": 53,
+      "trades": 12,
+      "colonies": 17,
+      "alive": 3,
       "viable": 2
     },
     {
       "seed": 3620906,
       "years": 160,
       "civilizations": 6,
-      "attacks": 93,
-      "trades": 57,
+      "attacks": 56,
+      "trades": 37,
       "colonies": 19,
-      "alive": 6,
+      "alive": 5,
       "viable": 3
     },
     {
       "seed": 3621177,
       "years": 160,
       "civilizations": 6,
-      "attacks": 96,
-      "trades": 34,
-      "colonies": 18,
+      "attacks": 73,
+      "trades": 25,
+      "colonies": 19,
       "alive": 5,
-      "viable": 0
+      "viable": 1
     },
     {
       "seed": 3621448,
       "years": 160,
       "civilizations": 6,
-      "attacks": 100,
-      "trades": 17,
-      "colonies": 16,
-      "alive": 3,
-      "viable": 0
+      "attacks": 32,
+      "trades": 26,
+      "colonies": 18,
+      "alive": 4,
+      "viable": 2
     },
     {
       "seed": 3621719,
       "years": 160,
       "civilizations": 6,
-      "attacks": 97,
-      "trades": 37,
-      "colonies": 17,
+      "attacks": 86,
+      "trades": 11,
+      "colonies": 19,
       "alive": 3,
-      "viable": 1
+      "viable": 2
     },
     {
       "seed": 3621990,
       "years": 160,
       "civilizations": 6,
-      "attacks": 109,
-      "trades": 54,
-      "colonies": 20,
-      "alive": 6,
-      "viable": 2
+      "attacks": 76,
+      "trades": 17,
+      "colonies": 19,
+      "alive": 4,
+      "viable": 4
     },
     {
       "seed": 3622261,
       "years": 160,
       "civilizations": 6,
-      "attacks": 112,
-      "trades": 48,
-      "colonies": 22,
+      "attacks": 97,
+      "trades": 29,
+      "colonies": 21,
       "alive": 3,
-      "viable": 3
+      "viable": 2
     },
     {
       "seed": 3622532,
       "years": 160,
       "civilizations": 6,
-      "attacks": 104,
-      "trades": 19,
-      "colonies": 18,
-      "alive": 4,
-      "viable": 2
+      "attacks": 117,
+      "trades": 21,
+      "colonies": 20,
+      "alive": 5,
+      "viable": 4
     },
     {
       "seed": 3622803,
       "years": 160,
       "civilizations": 6,
-      "attacks": 133,
-      "trades": 22,
-      "colonies": 19,
+      "attacks": 87,
+      "trades": 30,
+      "colonies": 20,
       "alive": 5,
-      "viable": 4
+      "viable": 5
     },
     {
       "seed": 3623074,
       "years": 160,
       "civilizations": 6,
-      "attacks": 139,
-      "trades": 68,
-      "colonies": 19,
+      "attacks": 106,
+      "trades": 29,
+      "colonies": 20,
       "alive": 6,
-      "viable": 4
+      "viable": 5
     },
     {
       "seed": 3623345,
       "years": 160,
       "civilizations": 6,
-      "attacks": 114,
-      "trades": 64,
-      "colonies": 21,
-      "alive": 5,
-      "viable": 3
+      "attacks": 74,
+      "trades": 44,
+      "colonies": 19,
+      "alive": 6,
+      "viable": 2
     },
     {
       "seed": 3623616,
       "years": 160,
       "civilizations": 6,
-      "attacks": 102,
-      "trades": 14,
+      "attacks": 76,
+      "trades": 10,
       "colonies": 20,
-      "alive": 6,
-      "viable": 3
+      "alive": 5,
+      "viable": 1
     },
     {
       "seed": 3623887,
       "years": 160,
       "civilizations": 6,
-      "attacks": 108,
-      "trades": 32,
+      "attacks": 100,
+      "trades": 26,
       "colonies": 18,
       "alive": 5,
-      "viable": 3
+      "viable": 4
     },
     {
       "seed": 3624158,
       "years": 160,
       "civilizations": 6,
-      "attacks": 94,
-      "trades": 25,
-      "colonies": 20,
-      "alive": 3,
-      "viable": 2
+      "attacks": 69,
+      "trades": 13,
+      "colonies": 22,
+      "alive": 5,
+      "viable": 3
     },
     {
       "seed": 3624429,
       "years": 160,
       "civilizations": 6,
-      "attacks": 101,
-      "trades": 18,
-      "colonies": 15,
-      "alive": 5,
-      "viable": 3
+      "attacks": 94,
+      "trades": 22,
+      "colonies": 18,
+      "alive": 6,
+      "viable": 5
     },
     {
       "seed": 3624700,
       "years": 160,
       "civilizations": 6,
-      "attacks": 62,
-      "trades": 20,
+      "attacks": 27,
+      "trades": 12,
       "colonies": 19,
-      "alive": 4,
-      "viable": 1
+      "alive": 3,
+      "viable": 2
     },
     {
       "seed": 3624971,
       "years": 160,
       "civilizations": 6,
-      "attacks": 74,
-      "trades": 26,
-      "colonies": 14,
-      "alive": 1,
-      "viable": 1
+      "attacks": 56,
+      "trades": 14,
+      "colonies": 18,
+      "alive": 2,
+      "viable": 2
     },
     {
       "seed": 3625242,
       "years": 160,
       "civilizations": 6,
-      "attacks": 109,
-      "trades": 25,
-      "colonies": 21,
-      "alive": 4,
-      "viable": 2
+      "attacks": 80,
+      "trades": 15,
+      "colonies": 17,
+      "alive": 5,
+      "viable": 3
     }
   ],
   "training": {
@@ -930,86 +930,86 @@
     {
       "seed": 912307,
       "initialContests": 22,
-      "finalContests": 90,
+      "finalContests": 69,
       "initialTrades": 210,
-      "finalTrades": 33
+      "finalTrades": 56
     },
     {
       "seed": 912434,
       "initialContests": 26,
-      "finalContests": 89,
+      "finalContests": 52,
       "initialTrades": 114,
-      "finalTrades": 6
+      "finalTrades": 11
     },
     {
       "seed": 912561,
       "initialContests": 11,
-      "finalContests": 126,
+      "finalContests": 102,
       "initialTrades": 237,
-      "finalTrades": 22
+      "finalTrades": 30
     },
     {
       "seed": 912688,
       "initialContests": 31,
-      "finalContests": 91,
+      "finalContests": 97,
       "initialTrades": 275,
-      "finalTrades": 56
+      "finalTrades": 13
     },
     {
       "seed": 912815,
       "initialContests": 9,
-      "finalContests": 145,
+      "finalContests": 113,
       "initialTrades": 238,
-      "finalTrades": 48
+      "finalTrades": 29
     },
     {
       "seed": 912942,
       "initialContests": 27,
-      "finalContests": 145,
+      "finalContests": 83,
       "initialTrades": 328,
-      "finalTrades": 32
+      "finalTrades": 31
     },
     {
       "seed": 913069,
       "initialContests": 9,
-      "finalContests": 95,
+      "finalContests": 62,
       "initialTrades": 251,
-      "finalTrades": 52
+      "finalTrades": 38
     },
     {
       "seed": 913196,
       "initialContests": 27,
-      "finalContests": 92,
+      "finalContests": 65,
       "initialTrades": 308,
-      "finalTrades": 8
+      "finalTrades": 4
     },
     {
       "seed": 913323,
       "initialContests": 31,
-      "finalContests": 132,
+      "finalContests": 85,
       "initialTrades": 223,
-      "finalTrades": 39
+      "finalTrades": 20
     },
     {
       "seed": 913450,
       "initialContests": 7,
-      "finalContests": 58,
+      "finalContests": 55,
       "initialTrades": 232,
-      "finalTrades": 44
+      "finalTrades": 3
     },
     {
       "seed": 913577,
       "initialContests": 27,
-      "finalContests": 112,
+      "finalContests": 108,
       "initialTrades": 229,
-      "finalTrades": 65
+      "finalTrades": 73
     },
     {
       "seed": 913704,
       "initialContests": 18,
-      "finalContests": 123,
+      "finalContests": 82,
       "initialTrades": 223,
-      "finalTrades": 47
+      "finalTrades": 23
     }
   ],
   "adaptationProbe": {

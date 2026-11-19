@@ -1,5 +1,4 @@
 import { createStarMap } from './starfield.js';
-import { createBattleView } from './battle.js';
 const $ = (id) => document.getElementById(id);
 const labels = {
   wait: 'Hold reserves',
@@ -50,13 +49,21 @@ let signalReplay = null,
   renderedLog = [],
   compareToken = 0;
 let feature = null,
-  replay = null,
   directorFrom = 0;
-const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const followEnabled = () => $('followAction').checked;
 const nextHighlight = () => (followEnabled() ? frame?.nextHighlight : frame?.nextBeat);
-const accents = { Battle: '#ffae8c', Science: '#b8deff', Diplomacy: '#bde996', Survival: '#edc18c' };
-const chart = createStarMap($('sky'), selectSite);
+const accents = {
+  Conflict: '#ffae8c',
+  Science: '#b8deff',
+  Diplomacy: '#bde996',
+  Expansion: '#97dfe6',
+  Survival: '#edc18c',
+};
+const chart = createStarMap($('sky'), (id) => {
+  if (!meta) return;
+  openInspector();
+  void selectSite(id).catch(showError);
+});
 const status = (text) => {
   $('status').textContent = text;
 };
@@ -136,10 +143,11 @@ function eventList(items) {
     : '<p class="minor">No entries at this date.</p>';
 }
 function drawMap(year = month / 12) {
-  if (!frame || replay) return;
+  if (!frame) return;
   const signals = signalReplay ? [...frame.signals, signalReplay] : frame.signals;
   chart.draw({
     ...frame,
+    mapId: [meta.version, meta.seed, meta.scenario, meta.systems].join('/'),
     year,
     selected,
     signals,
@@ -148,103 +156,60 @@ function drawMap(year = month / 12) {
   });
 }
 function armFeature() {
-  if (!feature || replay) return;
-  const now = performance.now();
-  const cinematic = feature.event.battle && !feature.watched && !reducedMotion.matches;
-  feature.cinematicAt = cinematic ? now + 900 : null;
-  feature.until = now + (cinematic ? 8900 : 4500);
+  if (feature) feature.until = performance.now() + 3600;
 }
 function present(event, animate = true) {
-  feature = { event, until: Infinity, cinematicAt: null, watched: false };
-  const { category, system, originSystem, battle, title, body, other, faction } = event;
-  $('spotlight').hidden = false;
-  $('spotlight').style.setProperty('--accent', accents[category] || 'var(--ice)');
-  $('highlightContext').textContent = `${category} · ${system} · ${date(event.t)}`;
-  $('highlightTitle').textContent = title;
-  $('highlightBody').textContent = battle
-    ? `${battle.attacker.name} challenged ${battle.defender.name}. ${body}`
-    : category === 'Diplomacy' && other && faction && other !== faction
-      ? `${other} and ${faction}. ${event.kind === 'report' ? `Passage offer from ${originSystem} received at ${system}.` : body}`
-      : body;
-  $('watchBattle').hidden = !battle;
+  feature = { event, until: Infinity };
   if (playing && followEnabled()) armFeature();
   drawMap();
-  chart.focus(event.site, { animate, zoom: battle ? 2.65 : 2.25 });
-}
-function dismissBattle(restore = false) {
-  if (!replay) return;
-  const hadFocus = $('battleStage').contains(document.activeElement);
-  replay.view.destroy();
-  replay = null;
-  $('battleStage').hidden = true;
-  if (restore && hadFocus)
-    (feature?.event.battle ? $('watchBattle') : $('sky')).focus({ preventScroll: true });
-  drawMap();
+  chart.focus(event.site, { animate, zoom: 2.25 });
 }
 function clearFeature() {
   feature = null;
-  dismissBattle();
-  $('spotlight').hidden = true;
-}
-const battleLength = 5600;
-function showBattle(event, automatic = false) {
-  dismissBattle();
-  if (feature?.event.id === event.id) {
-    feature.watched = true;
-    feature.cinematicAt = null;
-  }
-  const { attacker, defender, strength } = event.battle;
-  $('battleTitle').textContent = `Battle at ${event.system}`;
-  $('battleDate').textContent = `${date(event.t)} · Expedition from ${event.originSystem}`;
-  for (const [side, party, value, color] of [
-    ['attack', attacker, strength?.attack, '#ffae8c'],
-    ['defense', defender, strength?.defense, '#91e4ff'],
-  ]) {
-    $(side + 'Side').style.setProperty('--side', color);
-    $(side + 'Name').textContent = party.name;
-    $(side + 'Strength').textContent = value == null ? '' : `Strength ${value}`;
-  }
-  $('battleStage').hidden = false;
-  const view = createBattleView($('battleCanvas'), event);
-  const still = reducedMotion.matches;
-  replay = {
-    view,
-    event,
-    automatic,
-    progress: still ? 1 : 0,
-    started: still ? null : performance.now(),
-    end: null,
-  };
-  paintBattle();
-  if (!automatic) $('closeBattle').focus({ preventScroll: true });
-}
-function paintBattle() {
-  const { progress, event, view, started } = replay;
-  $('battleProgress').value = progress;
-  $('battlePhase').textContent =
-    progress < 0.23 ? 'Expedition arrives' : progress < 0.67 ? 'Fleets engage' : event.title;
-  const label = progress === 1 ? 'Replay battle' : started === null ? 'Resume replay' : 'Pause replay';
-  if ($('battleToggle').textContent !== label) $('battleToggle').textContent = label;
-  view.render(progress);
 }
 function updatePresentation(now) {
-  if (playing && feature?.cinematicAt != null && now >= feature.cinematicAt) {
-    showBattle(feature.event, true);
-  }
-  if (replay?.started != null) {
-    replay.progress = Math.max(0, Math.min(1, (now - replay.started) / battleLength));
-    if (replay.progress === 1) {
-      replay.started = null;
-      replay.end = now + 1700;
-    }
-    paintBattle();
-  }
-  if (!playing) return;
-  if (replay?.automatic && replay.end != null && now >= replay.end) dismissBattle(true);
-  if (!replay && feature && now >= feature.until) {
+  if (playing && feature && now >= feature.until) {
     clearFeature();
     drawMap();
   }
+}
+function renderNews() {
+  const list = $('newsFeed');
+  $('newsScope').textContent = lens < 0 ? 'Galaxy overview' : 'Received at ' + meta.chart[lens].name;
+  const scope = runId + '/' + lens;
+  const key = [scope, ...frame.news.map((e) => e.id)].join('/');
+  if (list.dataset.key === key) return;
+
+  const sameScope = list.dataset.scope === scope;
+  const front =
+    sameScope && list.scrollTop > 4
+      ? Array.from(list.children).find((row) => row.offsetTop + row.offsetHeight > list.scrollTop)
+      : null;
+  const offset = front ? front.offsetTop - list.scrollTop : 0;
+  const focused =
+    sameScope && list.contains(document.activeElement) ? document.activeElement.dataset.event : null;
+  list.dataset.key = key;
+  list.dataset.scope = scope;
+  list.innerHTML = frame.news.length
+    ? frame.news
+        .map((e) => {
+          let system = e.system;
+          if (e.originSystem && ['trade', 'conflict'].includes(e.kind))
+            system = e.originSystem + ' → ' + e.system;
+          if (e.originSystem && e.kind === 'report') system += ' · Report on ' + e.originSystem;
+          return `<button class="story" data-event="${e.id}" style="--story-accent:${accents[e.category] || 'var(--muted)'}">
+            <span class="story-context"><span>${esc(e.category)}</span><span>${date(e.t)}</span></span>
+            <strong>${esc(e.title)}</strong>
+            <span class="story-system">${esc(system)}</span>
+            <span class="story-body">${esc(e.body)}</span>
+          </button>`;
+        })
+        .join('')
+    : '<p class="minor news-empty">No news at this date.</p>';
+  const anchor = front && list.querySelector('[data-event="' + front.dataset.event + '"]');
+  list.scrollTop = anchor ? anchor.offsetTop - offset : 0;
+  if (focused != null)
+    list.querySelector('[data-event="' + focused + '"]')?.focus({ preventScroll: true });
 }
 function renderFrame() {
   const s = frame.site,
@@ -253,7 +218,7 @@ function renderFrame() {
   $('timeline').value = month;
   $('siteSelect').value = selected;
   $('mapLabel').textContent =
-    lens < 0 ? 'SECTOR MAP' : meta.chart[lens].name.toUpperCase() + ' RECEIVER';
+    lens < 0 ? '3D STAR MAP' : meta.chart[lens].name.toUpperCase() + ' RECEIVER';
   $('mapSub').textContent =
     lens < 0
       ? frame.stats.sites + ' occupied systems · ' + frame.stats.attacks + ' contest departures'
@@ -330,11 +295,13 @@ function renderFrame() {
     feed.dataset.key = feedKey;
     feed.innerHTML = eventList(frame.feed);
   }
+  renderNews();
   $('nextBeat').disabled = nextHighlight() == null;
   $('step').disabled = month >= meta.years * 12;
   drawMap();
   if (tab === 'chronicle') void refreshLog().catch(showError);
-  if (branch) void compare().catch(showError);
+  if (tab === 'lineages' && !playing) void showLedger().catch(showError);
+  if (branch && $('inspector').open) void compare().catch(showError);
 }
 async function refresh(event = -1, followFrom) {
   if (!meta) return;
@@ -398,6 +365,7 @@ async function load(id, opts = {}) {
   meta = reply.meta;
   parent = reply.parent;
   branch = reply.branch;
+  if (branch) $('inspector').open = true;
   const opening =
     followEnabled() && !branch && opts.month == null && opts.lens == null ? meta.openingHighlight : null;
   month = Math.min(meta.years * 12, opts.month ?? (branch ? branch.t : (opening?.t ?? meta.opening)));
@@ -417,9 +385,9 @@ async function load(id, opts = {}) {
   history.replaceState(null, '', '#' + runId);
   await refresh(opening?.id);
   if (n !== loadNo) return;
-  if (!feature) chart.focus(selected);
+  if (!feature && (branch || opts.site != null)) chart.focus(selected);
   status(branch ? 'Alternate timeline' : 'Paused');
-  $('comparison').hidden = !branch || tab !== 'observatory';
+  $('comparison').hidden = !branch;
 }
 function inspectOrder(d) {
   const opt = d.options[d.chosen],
@@ -525,6 +493,9 @@ async function inspectEvent(e) {
       '</p><p>' +
       esc(e.body) +
       '</p>' +
+      (e.combat
+        ? `<p class="minor">Recorded strength · Expedition ${e.combat.attack} · Garrison ${e.combat.defense}</p>`
+        : '') +
       (e.origin != null
         ? '<p class="minor">Observed at source in ' +
           date(e.origin) +
@@ -534,7 +505,6 @@ async function inspectEvent(e) {
         : '') +
       '<div class="row">' +
       btn('viewMoment', 'Show this moment') +
-      (f.highlight?.battle ? btn('battleFromRecord', 'Watch 3D battle') : '') +
       (canTrace ? btn('traceLight', 'Follow signal in galaxy view') : '') +
       (e.decision ? btn('viewDecision', 'Inspect order') : '') +
       (f.source ? btn('viewCause', 'Open source event') : '') +
@@ -547,14 +517,6 @@ async function inspectEvent(e) {
     await goto(e.t, e.id);
     if (!feature) chart.focus(selected);
   });
-  if (f.highlight?.battle)
-    hook('battleFromRecord', async () => {
-      close();
-      changeTab('observatory');
-      selected = e.site;
-      const moment = await goto(e.t, e.id);
-      if (moment?.highlight?.battle) showBattle(moment.highlight);
-    });
   if (canTrace)
     hook('traceLight', async () => {
       close();
@@ -611,14 +573,15 @@ function changeTab(which) {
     b.classList.toggle('active', b.dataset.tab === tab);
     b.setAttribute('aria-current', b.dataset.tab === tab ? 'page' : 'false');
   }
-  $('workspace').hidden = $('inspector').hidden = tab !== 'observatory';
-  $('comparison').hidden = !branch || tab !== 'observatory';
+  $('observatoryPanel').hidden = tab !== 'observatory';
+  $('dock').scrollTop = 0;
+  $('comparison').hidden = !branch;
   $('chroniclePanel').hidden = tab !== 'chronicle';
   $('guidePanel').hidden = tab !== 'guide';
   $('ledgerPanel').hidden = tab !== 'lineages';
   if (tab === 'lineages') void showLedger().catch(showError);
   if (tab === 'chronicle') void refreshLog().catch(showError);
-  if (tab === 'observatory' && frame) drawMap();
+  drawMap();
 }
 async function showLedger() {
   if (!meta) return;
@@ -673,17 +636,35 @@ async function showLedger() {
     '</tbody></table></div>';
   for (const b of $('ledgerBody').querySelectorAll('[data-focus]'))
     b.onclick = safely(async () => {
-      changeTab('observatory');
+      openInspector();
       await selectSite(Number(b.dataset.focus));
       chart.focus(selected);
     });
 }
 for (const b of document.querySelectorAll('[data-tab]')) b.onclick = () => changeTab(b.dataset.tab);
+function openInspector() {
+  if (tab !== 'observatory') changeTab('observatory');
+  $('inspector').open = true;
+}
+hook('inspector', () => {
+  if ($('inspector').open && branch) return compare();
+}, 'toggle');
+hook('newsFeed', (e) => {
+  const id = e.target.closest('[data-event]')?.dataset.event;
+  return inspectEvent(frame?.news.find((story) => story.id === Number(id)));
+});
+hook('newsArchive', () => {
+  logPage = 0;
+  $('logScope').value = 'all';
+  $('logFilter').value = 'major';
+  changeTab('chronicle');
+});
 hook('feed', (e) => inspectEvent(frame?.feed[e.target.closest('[data-index]')?.dataset.index]));
 hook('logRows', (e) => inspectEvent(renderedLog[e.target.closest('[data-index]')?.dataset.index]));
 hook('allEvents', () => {
   logPage = 0;
   $('logFilter').value = 'all';
+  $('logScope').value = 'region';
   changeTab('chronicle');
 });
 for (const id of ['logFilter', 'logScope'])
@@ -728,7 +709,7 @@ hook(
 hook('zoomIn', () => chart.zoomBy(1.4));
 hook('zoomOut', () => chart.zoomBy(1 / 1.4));
 hook('fitMap', () => chart.reset());
-const theater = $('workspace');
+const theater = $('theater');
 const expanded = () =>
   document.fullscreenElement === theater || theater.classList.contains('map-expanded');
 function fullscreenLabel() {
@@ -768,22 +749,6 @@ hook(
   },
   'change',
 );
-hook('watchBattle', () => feature?.event.battle && showBattle(feature.event));
-hook('closeBattle', () => {
-  dismissBattle(true);
-  if (feature && playing) armFeature();
-});
-hook('battleToggle', () => {
-  if (!replay) return;
-  replay.automatic = false;
-  if (replay.started != null) replay.started = null;
-  else {
-    if (replay.progress === 1) replay.progress = 0;
-    replay.started = performance.now() - replay.progress * battleLength;
-    replay.end = null;
-  }
-  paintBattle();
-});
 hook('play', async () => {
   if (!meta) return;
   if (playing) {
@@ -831,7 +796,7 @@ function tick(now) {
   const quiet = next == null || next - month > 60;
   const speed = !guided
     ? base
-    : feature || replay
+    : feature
       ? Math.min(base, 0.45)
       : near
         ? Math.min(base, 1.5)
@@ -855,12 +820,12 @@ function tick(now) {
     } else if (signalReplay) status('Following evidence');
     else status((guided ? 'Guided · ' : '') + speed + ' yr/s');
     const eligible =
-      follow && !feature && !replay && (target >= (next ?? Infinity) || directorFrom < from);
+      follow && !feature && (target >= (next ?? Infinity) || directorFrom < from);
     playBusy = true;
     lastAdvance = now;
     refresh(-1, eligible ? Math.max(directorFrom, target - 48) : undefined)
       .then((f) => {
-        if (f && !feature && !replay && !eligible) directorFrom = f.t;
+        if (f && !feature && !eligible) directorFrom = f.t;
       })
       .catch((e) => {
         stop();
@@ -922,7 +887,7 @@ async function newRun() {
 }
 hook('newRun', newRun);
 async function compare() {
-  if (!parent || !frame || tab !== 'observatory') return;
+  if (!parent || !frame || tab !== 'observatory' || !$('inspector').open) return;
   const n = ++compareToken;
   const response = await api(endpoint('status', {}, parent));
   if (n !== compareToken) return;

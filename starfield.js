@@ -4,6 +4,8 @@ const TAU = 2 * Math.PI;
 const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
 const smooth = (t) => t * t * (3 - 2 * t);
 const mix = (a, b, t) => a + (b - a) * t;
+const FIT_YAW = -0.21;
+const FIT_PITCH = 0.82;
 
 function randomSequence(seed) {
   return () => {
@@ -93,43 +95,6 @@ function circle(g, x, y, radius) {
   g.arc(x, y, radius, 0, TAU);
 }
 
-function drawGrid(g, width, height, project, scale) {
-  let step = 10;
-  while (step * scale < 52) step *= 2;
-  while (step * scale > 155) step /= 2;
-  const [ox, oy] = project(0, 0);
-  const gap = step * scale;
-  const firstX = Math.ceil(-ox / gap);
-  const firstY = Math.ceil(-oy / gap);
-  g.lineWidth = 0.65;
-  g.strokeStyle = 'rgba(135,167,184,.13)';
-  g.beginPath();
-  for (let i = firstX; ox + i * gap < width; i++) {
-    const x = Math.round(ox + i * gap) + 0.5;
-    g.moveTo(x, 0);
-    g.lineTo(x, height);
-  }
-  for (let i = firstY; oy + i * gap < height; i++) {
-    const y = Math.round(oy + i * gap) + 0.5;
-    g.moveTo(0, y);
-    g.lineTo(width, y);
-  }
-  g.stroke();
-  g.strokeStyle = 'rgba(168,191,200,.24)';
-  g.beginPath();
-  for (let i = firstX; ox + i * gap < width; i++) {
-    for (let j = firstY; oy + j * gap < height; j++) {
-      const x = Math.round(ox + i * gap) + 0.5;
-      const y = Math.round(oy + j * gap) + 0.5;
-      g.moveTo(x - 2.5, y);
-      g.lineTo(x + 2.5, y);
-      g.moveTo(x, y - 2.5);
-      g.lineTo(x, y + 2.5);
-    }
-  }
-  g.stroke();
-}
-
 export function createStarMap(canvas, onSelect = () => {}) {
   const g = canvas.getContext('2d', { alpha: false });
   const sky = makeSky();
@@ -137,9 +102,20 @@ export function createStarMap(canvas, onSelect = () => {}) {
   let frame = { systems: [], fleets: [], signals: [], selected: null, year: 0 };
   let starsById = new Map();
   let positions = [];
-  let camera = { x: 50, y: 50, zoom: 1 };
+  let bounds = { x: 50, y: 50, z: 0, halfX: 50, halfY: 50, halfZ: 0 };
+  const fitCamera = () => ({
+    x: bounds.x,
+    y: bounds.y,
+    z: bounds.z,
+    yaw: FIT_YAW,
+    pitch: FIT_PITCH,
+    zoom: 1,
+  });
+  let camera = fitCamera();
+  let fitWidth = 100;
+  let fitHeight = 100;
   let travel = null;
-  let bounds = { x: 50, y: 50, spanX: 100, spanY: 100 };
+  let cosYaw, sinYaw, cosPitch, sinPitch;
   let width = 1;
   let height = 1;
   let scale = 1;
@@ -154,27 +130,53 @@ export function createStarMap(canvas, onSelect = () => {}) {
   if (!canvas.hasAttribute('aria-label')) {
     canvas.setAttribute(
       'aria-label',
-      'Interactive star chart. Arrow keys pan, plus and minus zoom, Home fits the map, and Enter selects the closest system to the center.',
+      '3D star map. Drag or use arrow keys to orbit, hold Shift to pan, and use plus and minus to zoom. Home fits the map. Enter selects the central system.',
     );
   }
 
-  function project(x, y) {
-    return [(x - camera.x) * scale + width / 2, (y - camera.y) * scale + height / 2];
+  function project(x, y, z = 0) {
+    const dx = x - camera.x;
+    const dy = y - camera.y;
+    const dz = z - camera.z;
+    const u = cosYaw * dx + sinYaw * dy;
+    const v = -sinYaw * dx + cosYaw * dy;
+    return [
+      width / 2 + scale * u,
+      height / 2 + scale * (v * cosPitch + dz * sinPitch),
+      dz * cosPitch - v * sinPitch,
+    ];
+  }
+  function shiftCamera(x, y) {
+    camera.x += (x * cosYaw - y * sinYaw * cosPitch) / scale;
+    camera.y += (x * sinYaw + y * cosYaw * cosPitch) / scale;
+    camera.z += (y * sinPitch) / scale;
   }
   function updateBounds(systems) {
-    if (!systems.length) return;
-    const xs = systems.map((s) => s.x),
-      ys = systems.map((s) => s.y);
-    const loX = Math.min(...xs),
-      hiX = Math.max(...xs);
-    const loY = Math.min(...ys),
-      hiY = Math.max(...ys);
-    bounds = {
-      x: (loX + hiX) / 2,
-      y: (loY + hiY) / 2,
-      spanX: Math.max(12, hiX - loX),
-      spanY: Math.max(12, hiY - loY),
-    };
+    for (const [axis, half] of [
+      ['x', 'halfX'],
+      ['y', 'halfY'],
+      ['z', 'halfZ'],
+    ]) {
+      const values = systems.map((s) => s[axis] ?? 0);
+      const min = Math.min(...values),
+        max = Math.max(...values);
+      bounds[axis] = (min + max) / 2;
+      bounds[half] = Math.max(axis === 'z' ? 0 : 6, (max - min) / 2);
+    }
+    // Fit the stars in the reset orientation. Orbiting keeps that scale.
+    const c = Math.cos(FIT_YAW),
+      s = Math.sin(FIT_YAW),
+      tilt = Math.cos(FIT_PITCH),
+      lift = Math.sin(FIT_PITCH);
+    fitWidth = 12;
+    fitHeight = 12;
+    for (const star of systems) {
+      const x = star.x - bounds.x,
+        y = star.y - bounds.y,
+        z = (star.z ?? 0) - bounds.z;
+      fitWidth = Math.max(fitWidth, 2 * Math.abs(c * x + s * y));
+      fitHeight = Math.max(fitHeight, 2 * Math.abs((-s * x + c * y) * tilt + z * lift));
+    }
   }
   function resize() {
     const rect = canvas.getBoundingClientRect();
@@ -190,10 +192,28 @@ export function createStarMap(canvas, onSelect = () => {}) {
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
     const padX = Math.min(width * 0.1, 64),
       padY = Math.min(height * 0.12, 58);
-    scale = Math.max(
-      0.001,
-      Math.min((width - 2 * padX) / bounds.spanX, (height - 2 * padY) / bounds.spanY) * camera.zoom,
-    );
+    scale = Math.min((width - 2 * padX) / fitWidth, (height - 2 * padY) / fitHeight) * camera.zoom;
+    cosYaw = Math.cos(camera.yaw);
+    sinYaw = Math.sin(camera.yaw);
+    cosPitch = Math.cos(camera.pitch);
+    sinPitch = Math.sin(camera.pitch);
+  }
+
+  function drawGrid() {
+    const { x, y, z, halfX, halfY, halfZ } = bounds;
+    const floor = z - halfZ - 3;
+    g.lineWidth = 0.75;
+    g.strokeStyle = 'rgba(135,167,184,.2)';
+    g.beginPath();
+    for (let i = -5; i <= 5; i++) {
+      const gx = x + (i * halfX) / 5;
+      const gy = y + (i * halfY) / 5;
+      g.moveTo(...project(gx, y - halfY, floor).slice(0, 2));
+      g.lineTo(...project(gx, y + halfY, floor).slice(0, 2));
+      g.moveTo(...project(x - halfX, gy, floor).slice(0, 2));
+      g.lineTo(...project(x + halfX, gy, floor).slice(0, 2));
+    }
+    g.stroke();
   }
 
   function drawTransit(trip, signal, stars) {
@@ -209,8 +229,8 @@ export function createStarMap(canvas, onSelect = () => {}) {
       trip.end <= trip.start
     )
       return;
-    const [ax, ay] = project(a.x, a.y),
-      [bx, by] = project(b.x, b.y);
+    const [ax, ay] = project(a.x, a.y, a.z),
+      [bx, by] = project(b.x, b.y, b.z);
     if (
       Math.max(ax, bx) < -40 ||
       Math.min(ax, bx) > width + 40 ||
@@ -262,17 +282,33 @@ export function createStarMap(canvas, onSelect = () => {}) {
   function marks() {
     const labels = [];
     const smallScene = frame.systems.length <= 25;
-    positions = [];
-    for (const s of frame.systems) {
-      const [x, y] = project(s.x, s.y);
-      if (x < -20 || x > width + 20 || y < -20 || y > height + 20) continue;
+    positions = frame.systems
+      .map((s) => {
+        const [x, y, depth] = project(s.x, s.y, s.z);
+        return { s, x, y, depth };
+      })
+      .filter(({ x, y }) => x >= -20 && x <= width + 20 && y >= -20 && y <= height + 20)
+      .sort((a, b) => a.depth - b.depth);
+    const centerDepth = project(bounds.x, bounds.y, bounds.z)[2];
+    for (const { s, x, y, depth } of positions) {
       const selected = s.id === frame.selected;
       const hot = s.id === hovered;
       const controlled = s.owner !== null && s.owner !== undefined && s.known !== false;
       const stale = Boolean(s.stale);
       const color = controlled && s.color ? s.color : '#9cabbc';
-      const r = selected ? 4.5 : controlled ? (s.home ? 3.5 : 2.8) : 1.75;
-      positions.push({ s, x, y });
+      const proximity = clamp(0.5 + (depth - centerDepth) / 130, 0, 1);
+      const r = selected ? 4.5 : (controlled ? (s.home ? 3.5 : 2.8) : 1.75) * (0.8 + 0.4 * proximity);
+      if (selected && bounds.halfZ > 0) {
+        const [fx, fy] = project(s.x, s.y, bounds.z - bounds.halfZ - 3);
+        g.strokeStyle = 'rgba(151,223,230,.47)';
+        g.lineWidth = 1;
+        g.setLineDash([3, 5]);
+        g.beginPath();
+        g.moveTo(x, y);
+        g.lineTo(fx, fy);
+        g.stroke();
+        g.setLineDash([]);
+      }
       g.strokeStyle = color;
       g.fillStyle = color;
       if ((controlled || selected) && !stale) {
@@ -283,7 +319,7 @@ export function createStarMap(canvas, onSelect = () => {}) {
         circle(g, x, y, selected ? 11 : 6.5);
         g.fill();
       }
-      g.globalAlpha = controlled || selected ? 1 : 0.76;
+      g.globalAlpha = selected ? 1 : (controlled ? 1 : 0.78) * (0.58 + 0.42 * proximity);
       if (stale) {
         g.lineWidth = 1.05;
         circle(g, x, y, r + 0.5);
@@ -367,7 +403,7 @@ export function createStarMap(canvas, onSelect = () => {}) {
     if (travel) {
       const fraction = Math.min(1, (performance.now() - travel.start) / 780);
       const ease = fraction * fraction * (3 - 2 * fraction);
-      for (const field of ['x', 'y', 'zoom']) {
+      for (const field of ['x', 'y', 'z', 'zoom']) {
         camera[field] = travel.from[field] + (travel.to[field] - travel.from[field]) * ease;
       }
       if (fraction === 1) travel = null;
@@ -383,12 +419,12 @@ export function createStarMap(canvas, onSelect = () => {}) {
       ? 0
       : clamp((camera.y - bounds.y) * scale * 0.033, -height * 0.04, height * 0.04);
     g.drawImage(sky, (width - sw) / 2 - px, (height - sh) / 2 - py, sw, sh);
-    drawGrid(g, width, height, project, scale);
+    drawGrid();
     for (const s of frame.signals || []) drawTransit(s, true, starsById);
     for (const f of frame.fleets || []) drawTransit(f, false, starsById);
     const highlight = starsById.get(frame.highlightSite);
     if (highlight) {
-      const [x, y] = project(highlight.x, highlight.y);
+      const [x, y] = project(highlight.x, highlight.y, highlight.z);
       g.strokeStyle = frame.highlightColor || '#97dfe6';
       g.globalAlpha = 0.6;
       g.lineWidth = 1.25;
@@ -406,7 +442,7 @@ export function createStarMap(canvas, onSelect = () => {}) {
   }
   function reset() {
     travel = null;
-    camera = { x: bounds.x, y: bounds.y, zoom: 1 };
+    camera = fitCamera();
     schedulePaint();
   }
   function draw(next) {
@@ -414,13 +450,11 @@ export function createStarMap(canvas, onSelect = () => {}) {
     const systems = frame.systems || [];
     starsById = new Map(systems.map((s) => [s.id, s]));
     // Preserve the observer's camera when a timeline update reshapes the visible evidence.
-    const identity = systems.length
-      ? String(systems[0].id) + '/' + systems[0].x + '/' + systems[0].y
-      : null;
+    const identity = systems.length ? frame.mapId : null;
     if (mapIdentity !== identity && identity !== null) {
       updateBounds(systems);
       travel = null;
-      camera = { x: bounds.x, y: bounds.y, zoom: 1 };
+      camera = fitCamera();
       mapIdentity = identity;
     }
     if (passiveFrame) cancelAnimationFrame(passiveFrame);
@@ -429,7 +463,7 @@ export function createStarMap(canvas, onSelect = () => {}) {
   function focus(id, { animate = false, zoom = Math.max(camera.zoom, 1.75) } = {}) {
     const target = starsById.get(id);
     if (!target) return;
-    const to = { x: target.x, y: target.y, zoom };
+    const to = { ...camera, x: target.x, y: target.y, z: target.z ?? 0, zoom };
     travel = animate && !reduced.matches ? { start: performance.now(), from: { ...camera }, to } : null;
     if (!travel) camera = to;
     schedulePaint();
@@ -438,15 +472,15 @@ export function createStarMap(canvas, onSelect = () => {}) {
     travel = null;
     const next = clamp(camera.zoom * factor, 0.52, 18);
     const ratio = next / camera.zoom;
-    camera.x += ((x - width / 2) / scale) * (1 - 1 / ratio);
-    camera.y += ((y - height / 2) / scale) * (1 - 1 / ratio);
+    shiftCamera((x - width / 2) * (1 - 1 / ratio), (y - height / 2) * (1 - 1 / ratio));
     camera.zoom = next;
     schedulePaint();
   }
   function nearest(x, y, limit = 15) {
     let choice = null,
       best = limit * limit;
-    for (const p of positions) {
+    for (let i = positions.length - 1; i >= 0; i--) {
+      const p = positions[i];
       const distance = (p.x - x) ** 2 + (p.y - y) ** 2;
       if (distance < best) {
         choice = p.s;
@@ -474,7 +508,8 @@ export function createStarMap(canvas, onSelect = () => {}) {
       if (!e.isPrimary || e.button !== 0) return;
       travel = null;
       const [x, y] = coordinates(e);
-      drag = { x, y, cx: camera.x, cy: camera.y, moved: false };
+      drag = { x, y, from: { ...camera }, pan: e.shiftKey, moved: false };
+      hovered = null;
       canvas.setPointerCapture(e.pointerId);
       canvas.style.cursor = 'grabbing';
     },
@@ -487,8 +522,13 @@ export function createStarMap(canvas, onSelect = () => {}) {
       if (drag && e.isPrimary) {
         if (Math.hypot(x - drag.x, y - drag.y) > 4) drag.moved = true;
         if (drag.moved) {
-          camera.x = drag.cx - (x - drag.x) / scale;
-          camera.y = drag.cy - (y - drag.y) / scale;
+          if (drag.pan) {
+            camera = { ...drag.from };
+            shiftCamera(drag.x - x, drag.y - y);
+          } else {
+            camera.yaw = drag.from.yaw - (x - drag.x) * 0.009;
+            camera.pitch = clamp(drag.from.pitch + (y - drag.y) * 0.009, -1.55, 1.55);
+          }
           schedulePaint();
         }
       } else if (!drag) {
@@ -533,20 +573,21 @@ export function createStarMap(canvas, onSelect = () => {}) {
   canvas.addEventListener(
     'keydown',
     (e) => {
-      const amount = 48 / scale;
+      const arrows = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+      const direction = arrows[e.key];
+      if (direction) {
+        travel = null;
+        const [x, y] = direction;
+        if (e.shiftKey) shiftCamera(x * 48, y * 48);
+        else {
+          camera.yaw -= x * 0.15;
+          camera.pitch = clamp(camera.pitch + y * 0.15, -1.55, 1.55);
+        }
+        e.preventDefault();
+        schedulePaint();
+        return;
+      }
       switch (e.key) {
-        case 'ArrowLeft':
-          camera.x -= amount;
-          break;
-        case 'ArrowRight':
-          camera.x += amount;
-          break;
-        case 'ArrowUp':
-          camera.y -= amount;
-          break;
-        case 'ArrowDown':
-          camera.y += amount;
-          break;
         case '+':
         case '=':
           zoomBy(1.35);
