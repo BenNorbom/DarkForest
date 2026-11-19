@@ -2,7 +2,13 @@
 
 A local interstellar strategy simulation with six pretrained machine-learning policies, independent settlement memories, delayed observations, and reproducible alternate histories. The opening scenario contains 64 civilizations and 240 star systems. Runs support up to 1,000 simulated years.
 
-## Start
+## Install on Windows
+
+Download [Dark-Forest-Setup.exe](https://github.com/BenNorbom/DarkForest/releases/latest/download/Dark-Forest-Setup.exe) for Windows x64, run it, and open **Dark Forest** from the Start menu. The app includes its own runtime and runs simulations offline. The installer is unsigned, so Windows may show a SmartScreen prompt.
+
+Open **Updates** in the top bar and select **Check for updates**. When a newer version is available, select **Download update**, then **Restart and install**. Saved runs are kept in the Windows app’s user data folder across updates.
+
+## Run from source
 
 Use Node.js 22 or later. From this directory run:
 
@@ -11,6 +17,8 @@ npm start
 ```
 
 Open **http://127.0.0.1:4173/**. The project uses Node built-ins and browser APIs. All six checkpoints ship in `models.json`. Change `PORT` to choose a different local port. Run `npm test` for the simulation and replay checks.
+
+On Windows, run `npm ci` with Node.js 24, then `npm run desktop` to open the desktop app or `npm run dist:win` to build the installer in `dist/`. A successful Windows release workflow on `main` publishes the installer and update metadata to [GitHub Releases](https://github.com/BenNorbom/DarkForest/releases). The published version uses the package’s major and minor version and the workflow run number as its patch version.
 
 ## Observe
 
@@ -22,7 +30,7 @@ The sidebar news feed follows the simulation clock, newest first. Open a headlin
 
 Inspect an order to see its local evidence, reserves, action probability, and alternatives. Choose a different order to create a branch. Scrub the alternate timeline to compare the original and alternate at the same date. **Compare received evidence** finds their first differing recorded local observation or outcome in the requested window.
 
-Use **New run** to change seed, duration, population, and starting scenario. **Saved runs** restores previous simulations and branches. Local run recipes and matching engine, policy code, and weights are archived in `.runs/`. Reconstruction uses the pinned version and stable random draws. The worker reconstructs a branch from the seed and earlier interventions. Replays live in memory while viewed. Set `DARK_FOREST_STORE` to relocate the archive.
+Use **New run** to change seed, duration, population, and starting scenario. **Saved runs** restores previous simulations and branches. Run recipes and matching engine, policy code, and weights are archived in `.runs/` when running from source in the browser, or in `%APPDATA%\Dark Forest\runs` in the Windows app. Reconstruction uses the pinned version and stable random draws. The worker reconstructs a branch from the seed and earlier interventions. Replays live in memory while viewed. Set `DARK_FOREST_STORE` to relocate the archive.
 
 ## Mechanics
 

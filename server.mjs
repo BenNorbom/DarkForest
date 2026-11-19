@@ -7,6 +7,7 @@ import path from 'node:path';
 import { gzipSync } from 'node:zlib';
 const root = fileURLToPath(new URL('.', import.meta.url)),
   store = process.env.DARK_FOREST_STORE || path.join(root, '.runs');
+const desktop = process.parentPort;
 const digest = (value) => createHash('sha256').update(value).digest('hex').slice(0, 20);
 const read = (name) => readFile(path.join(root, name), 'utf8');
 const [engine, policy, checkpoints] = await Promise.all(
@@ -130,6 +131,11 @@ const server = http.createServer(async (req, res) => {
       'Content-Type': mime + (mime.startsWith('text/') ? '; charset=utf-8' : ''),
       'Cache-Control': 'no-store',
     };
+    if (desktop) {
+      headers['Content-Security-Policy'] =
+        "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; " +
+        "connect-src 'self'; img-src data:; base-uri 'none'; frame-ancestors 'none'; form-action 'none'";
+    }
     if (buf.length > 1800 && (req.headers['accept-encoding'] || '').includes('gzip')) {
       buf = gzipSync(buf, { level: 1 });
       headers['Content-Encoding'] = 'gzip';
@@ -138,6 +144,8 @@ const server = http.createServer(async (req, res) => {
     res.end(buf);
   }
   try {
+    if (desktop && req.headers.host !== '127.0.0.1:' + server.address().port)
+      return send({ error: 'Local host required' }, 403);
     const url = new URL(req.url, 'http://127.0.0.1'),
       p = url.pathname;
     if (
@@ -231,11 +239,13 @@ const server = http.createServer(async (req, res) => {
     send({ error: e.code === 'ENOENT' ? 'Run or asset unavailable' : e.message }, 400);
   }
 });
-const port = Number(process.env.PORT) || 4173;
+const port = desktop ? 0 : Number(process.env.PORT) || 4173;
 server.on('error', (e) => {
   console.error(e.message);
   process.exitCode = 1;
 });
-server.listen(port, '127.0.0.1', () =>
-  console.log('Dark Forest Observatory · http://127.0.0.1:' + port),
-);
+server.listen(port, '127.0.0.1', () => {
+  const { port } = server.address();
+  if (desktop) desktop.postMessage(port);
+  else console.log('Dark Forest Observatory · http://127.0.0.1:' + port);
+});

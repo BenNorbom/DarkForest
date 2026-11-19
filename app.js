@@ -115,6 +115,52 @@ function close() {
   if ($('dialog').open) $('dialog').close();
 }
 hook('closeDialog', close);
+if (window.desktopUpdates) {
+  const updates = window.desktopUpdates;
+  let latest = { phase: 'idle' };
+
+  function renderUpdate(state) {
+    latest = state;
+    const description = $('updateDescription'), action = $('updateAction');
+    if (!description || !action) return;
+
+    const { phase, version, percent } = state;
+    const views = {
+      idle: ['Check GitHub for a new version of Dark Forest.', 'Check for updates', 'check'],
+      checking: ['Checking GitHub for updates…', 'Checking…'],
+      current: [`Dark Forest ${version} is up to date.`, 'Check again', 'check'],
+      available: [`Dark Forest ${version} is available.`, 'Download update', 'download'],
+      downloading: [`Downloading Dark Forest ${version} (${percent}%)…`, 'Downloading…'],
+      ready: [`Dark Forest ${version} is ready to install.`, 'Restart and install', 'install'],
+      installing: ['Installing the update…', 'Installing…'],
+      error: ['Dark Forest couldn’t check for or download an update.', 'Try again', 'check'],
+      'install-error': ['Dark Forest couldn’t start the installer.', 'Try again', 'install'],
+      unavailable: ['Updates are available in the installed Windows app.'],
+    };
+    const [message, label, command] = views[phase];
+    description.textContent = message;
+    action.hidden = !label;
+    action.textContent = label || '';
+    action.disabled = !command;
+    action.onclick = command ? () => runUpdate(command) : null;
+  }
+
+  async function runUpdate(command) {
+    try {
+      renderUpdate(await updates.action(command));
+    } catch {
+      renderUpdate({ phase: 'error' });
+    }
+  }
+
+  updates.onState(renderUpdate);
+  $('openUpdates').hidden = false;
+  hook('openUpdates', () => {
+    modal('<h2>Dark Forest updates</h2><p id="updateDescription" role="status"></p><div class="row"><button type="button" id="updateAction" class="primary"></button></div>');
+    renderUpdate(latest);
+    return runUpdate();
+  });
+}
 const optionText = (o) =>
   labels[o.kind] +
   (o.project !== undefined

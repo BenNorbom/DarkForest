@@ -225,8 +225,9 @@ hr {
   height: 2px;
   background: var(--lime);
 }
-.topbar > .primary,
-.topbar > :last-child:not(.tabs):not(.brand) {
+.topbar-actions {
+  display: flex;
+  gap: 0.55rem;
   margin-left: auto;
 }
 .topbar .primary {
@@ -886,8 +887,7 @@ dialog::backdrop {
   .topbar .brand {
     order: 0;
   }
-  .topbar > .primary,
-  .topbar > :last-child:not(.tabs):not(.brand) {
+  .topbar-actions {
     order: 1;
   }
   .topbar .tabs {

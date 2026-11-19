@@ -1,14 +1,64 @@
 {
   "name": "dark-forest-observatory",
+  "productName": "Dark Forest",
   "version": "1.0.0",
+  "description": "A local interstellar strategy simulation and replay observatory.",
+  "author": "BenNorbom",
   "private": true,
   "type": "module",
+  "main": "desktop/main.cjs",
+  "repository": "github:BenNorbom/DarkForest",
   "scripts": {
     "start": "node server.mjs",
+    "desktop": "electron .",
+    "dist:win": "electron-builder --win nsis --x64 --publish never",
     "test": "node --test tests.mjs",
     "train": "node train.mjs"
   },
   "engines": {
     "node": ">=22"
+  },
+  "dependencies": {
+    "electron-updater": "6.8.11"
+  },
+  "devDependencies": {
+    "electron": "45.4.1",
+    "electron-builder": "26.18.0"
+  },
+  "build": {
+    "appId": "com.bennorbom.darkforest",
+    "files": [
+      "desktop/*.cjs"
+    ],
+    "extraResources": [
+      {
+        "from": ".",
+        "to": "simulation",
+        "filter": [
+          "app.js",
+          "balance-report.json",
+          "engine.mjs",
+          "index.html",
+          "models.json",
+          "observatory.css",
+          "policy.mjs",
+          "replay.mjs",
+          "server.mjs",
+          "starfield.js",
+          "worker.mjs"
+        ]
+      }
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "artifactName": "Dark-Forest-Setup.exe"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "BenNorbom",
+      "repo": "DarkForest"
+    }
   }
 }
