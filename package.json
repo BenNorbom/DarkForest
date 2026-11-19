@@ -45,6 +45,11 @@
           "replay.mjs",
           "server.mjs",
           "starfield.js",
+          "flight.mjs",
+          "encounters.mjs",
+          "commanders.mjs",
+          "system-replay.mjs",
+          "system-view.js",
           "worker.mjs"
         ]
       }

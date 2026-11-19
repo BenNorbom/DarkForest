@@ -1,7 +1,7 @@
 {
   "version": 2,
   "ruleset": "lineage-crossplay-2",
-  "simulatorVersion": "parallax-2",
+  "simulatorVersion": "command-1",
   "evaluationRollouts": 408,
   "independentSeeds": 24,
   "horizonYears": 160,
@@ -9,126 +9,126 @@
   "fitness": "4 × surviving lineage + 6 × viable community + bounded population and viable-refuge resilience (0–1). Extinct lineages score zero.",
   "crossplay": {
     "pretrained": {
-      "alive": 0.7083,
-      "viable": 0.4375,
-      "fitness": 5.846,
-      "population": 73.0292,
-      "settlements": 1.7708,
-      "attacks": 10.8542,
-      "trades": 4.1458,
-      "colonies": 4.4792,
-      "losses": 3.375
+      "alive": 0.8542,
+      "viable": 0.7292,
+      "fitness": 8.3892,
+      "population": 137.6,
+      "settlements": 3.1667,
+      "attacks": 6.8333,
+      "trades": 2.25,
+      "colonies": 4.5,
+      "losses": 0.6458
     },
     "initial": {
-      "alive": 0.4792,
+      "alive": 0.5625,
       "viable": 0.3333,
-      "fitness": 4.1805,
-      "population": 47.9458,
-      "settlements": 1.8958,
-      "attacks": 6.5625,
-      "trades": 1.4583,
-      "colonies": 1.5417,
-      "losses": 1.2083,
+      "fitness": 4.4979,
+      "population": 40.8792,
+      "settlements": 1.0208,
+      "attacks": 5.0833,
+      "trades": 0.8958,
+      "colonies": 1.2708,
+      "losses": 0.2917,
       "pairedFitnessAdvantageOfTrained": {
-        "mean": 1.6656,
-        "lower95": 0.0096,
-        "upper95": 3.3677
+        "mean": 3.8912,
+        "lower95": 2.5193,
+        "upper95": 5.2689
       }
     },
     "random": {
-      "alive": 0.625,
-      "viable": 0.4583,
-      "fitness": 5.5619,
-      "population": 50.3125,
-      "settlements": 1.3125,
-      "attacks": 3.75,
-      "trades": 2.1667,
-      "colonies": 2.3125,
-      "losses": 2,
+      "alive": 0.7292,
+      "viable": 0.375,
+      "fitness": 5.4843,
+      "population": 59.7896,
+      "settlements": 1.625,
+      "attacks": 4.0833,
+      "trades": 2.1042,
+      "colonies": 2.5208,
+      "losses": 0.6875,
       "pairedFitnessAdvantageOfTrained": {
-        "mean": 0.2841,
-        "lower95": -1.2007,
-        "upper95": 1.7104
+        "mean": 2.9049,
+        "lower95": 1.4344,
+        "upper95": 4.2173
       }
     },
     "turtle": {
-      "alive": 0.0625,
+      "alive": 0.0833,
       "viable": 0,
-      "fitness": 0.2606,
-      "population": 0.8729,
+      "fitness": 0.3469,
+      "population": 0.9458,
       "settlements": 0.0625,
       "attacks": 0,
       "trades": 0,
       "colonies": 0,
-      "losses": 0.2083,
+      "losses": 0.0833,
       "pairedFitnessAdvantageOfTrained": {
-        "mean": 5.5854,
-        "lower95": 4.4371,
-        "upper95": 6.7347
+        "mean": 8.0423,
+        "lower95": 7.0258,
+        "upper95": 9.056
       }
     },
     "fortress": {
-      "alive": 0.1875,
+      "alive": 0.2083,
       "viable": 0,
-      "fitness": 0.7904,
-      "population": 6.5104,
-      "settlements": 0.1458,
+      "fitness": 0.8776,
+      "population": 6.7521,
+      "settlements": 0.1875,
       "attacks": 0,
       "trades": 0,
       "colonies": 0,
-      "losses": 0.1875,
+      "losses": 0.0833,
       "pairedFitnessAdvantageOfTrained": {
-        "mean": 5.0557,
-        "lower95": 3.7895,
-        "upper95": 6.3211
+        "mean": 7.5116,
+        "lower95": 6.4266,
+        "upper95": 8.5631
       }
     },
     "raider": {
-      "alive": 0.2917,
-      "viable": 0.0625,
-      "fitness": 1.5978,
-      "population": 3.2458,
-      "settlements": 0.6875,
-      "attacks": 12.1458,
+      "alive": 0.1667,
+      "viable": 0,
+      "fitness": 0.6931,
+      "population": 2.4396,
+      "settlements": 0.0625,
+      "attacks": 7.6458,
       "trades": 0,
       "colonies": 0,
-      "losses": 1.1875,
+      "losses": 0.2917,
       "pairedFitnessAdvantageOfTrained": {
-        "mean": 4.2482,
-        "lower95": 3.0088,
-        "upper95": 5.4513
+        "mean": 7.696,
+        "lower95": 6.6132,
+        "upper95": 8.766
       }
     },
     "trader": {
       "alive": 0.0625,
       "viable": 0,
-      "fitness": 0.2609,
-      "population": 0.9521,
+      "fitness": 0.2602,
+      "population": 0.7042,
       "settlements": 0.0625,
       "attacks": 0,
-      "trades": 3.1458,
+      "trades": 2.1458,
       "colonies": 0,
-      "losses": 0.2083,
+      "losses": 0.0833,
       "pairedFitnessAdvantageOfTrained": {
-        "mean": 5.5851,
-        "lower95": 4.437,
-        "upper95": 6.7346
+        "mean": 8.129,
+        "lower95": 7.1245,
+        "upper95": 9.1152
       }
     },
     "disperser": {
-      "alive": 0.375,
-      "viable": 0.25,
-      "fitness": 3.1435,
-      "population": 10.2062,
-      "settlements": 0.375,
-      "attacks": 0.0208,
-      "trades": 0,
-      "colonies": 4.9167,
-      "losses": 0.125,
+      "alive": 0.2917,
+      "viable": 0.1667,
+      "fitness": 2.275,
+      "population": 8.6833,
+      "settlements": 0.25,
+      "attacks": 0,
+      "trades": 0.0417,
+      "colonies": 4.3542,
+      "losses": 0.1875,
       "pairedFitnessAdvantageOfTrained": {
-        "mean": 2.7025,
-        "lower95": 1.2443,
-        "upper95": 4.0892
+        "mean": 6.1142,
+        "lower95": 4.9388,
+        "upper95": 7.2404
       }
     }
   },
@@ -137,29 +137,29 @@
       "seed": 3619009,
       "years": 160,
       "civilizations": 6,
-      "attacks": 62,
-      "trades": 27,
-      "colonies": 18,
-      "alive": 5,
+      "attacks": 59,
+      "trades": 34,
+      "colonies": 20,
+      "alive": 6,
       "viable": 3
     },
     {
       "seed": 3619280,
       "years": 160,
       "civilizations": 6,
-      "attacks": 103,
-      "trades": 15,
+      "attacks": 49,
+      "trades": 18,
       "colonies": 19,
-      "alive": 5,
+      "alive": 4,
       "viable": 4
     },
     {
       "seed": 3619551,
       "years": 160,
       "civilizations": 6,
-      "attacks": 107,
-      "trades": 13,
-      "colonies": 17,
+      "attacks": 55,
+      "trades": 20,
+      "colonies": 18,
       "alive": 6,
       "viable": 3
     },
@@ -167,48 +167,48 @@
       "seed": 3619822,
       "years": 160,
       "civilizations": 6,
-      "attacks": 98,
-      "trades": 27,
+      "attacks": 44,
+      "trades": 19,
       "colonies": 20,
-      "alive": 6,
+      "alive": 5,
       "viable": 4
     },
     {
       "seed": 3620093,
       "years": 160,
       "civilizations": 6,
-      "attacks": 74,
-      "trades": 35,
-      "colonies": 23,
-      "alive": 5,
+      "attacks": 66,
+      "trades": 12,
+      "colonies": 20,
+      "alive": 4,
       "viable": 3
     },
     {
       "seed": 3620364,
       "years": 160,
       "civilizations": 6,
-      "attacks": 109,
-      "trades": 37,
-      "colonies": 20,
+      "attacks": 72,
+      "trades": 35,
+      "colonies": 19,
       "alive": 6,
-      "viable": 2
+      "viable": 6
     },
     {
       "seed": 3620635,
       "years": 160,
       "civilizations": 6,
-      "attacks": 53,
-      "trades": 12,
+      "attacks": 30,
+      "trades": 10,
       "colonies": 17,
-      "alive": 3,
+      "alive": 4,
       "viable": 2
     },
     {
       "seed": 3620906,
       "years": 160,
       "civilizations": 6,
-      "attacks": 56,
-      "trades": 37,
+      "attacks": 53,
+      "trades": 17,
       "colonies": 19,
       "alive": 5,
       "viable": 3
@@ -217,59 +217,59 @@
       "seed": 3621177,
       "years": 160,
       "civilizations": 6,
-      "attacks": 73,
-      "trades": 25,
-      "colonies": 19,
-      "alive": 5,
-      "viable": 1
-    },
-    {
-      "seed": 3621448,
-      "years": 160,
-      "civilizations": 6,
-      "attacks": 32,
-      "trades": 26,
+      "attacks": 51,
+      "trades": 16,
       "colonies": 18,
       "alive": 4,
       "viable": 2
     },
     {
+      "seed": 3621448,
+      "years": 160,
+      "civilizations": 6,
+      "attacks": 21,
+      "trades": 14,
+      "colonies": 17,
+      "alive": 4,
+      "viable": 3
+    },
+    {
       "seed": 3621719,
       "years": 160,
       "civilizations": 6,
-      "attacks": 86,
-      "trades": 11,
-      "colonies": 19,
-      "alive": 3,
-      "viable": 2
+      "attacks": 50,
+      "trades": 12,
+      "colonies": 17,
+      "alive": 5,
+      "viable": 4
     },
     {
       "seed": 3621990,
       "years": 160,
       "civilizations": 6,
-      "attacks": 76,
-      "trades": 17,
-      "colonies": 19,
-      "alive": 4,
-      "viable": 4
+      "attacks": 46,
+      "trades": 23,
+      "colonies": 21,
+      "alive": 6,
+      "viable": 3
     },
     {
       "seed": 3622261,
       "years": 160,
       "civilizations": 6,
-      "attacks": 97,
-      "trades": 29,
-      "colonies": 21,
-      "alive": 3,
+      "attacks": 45,
+      "trades": 11,
+      "colonies": 23,
+      "alive": 6,
       "viable": 2
     },
     {
       "seed": 3622532,
       "years": 160,
       "civilizations": 6,
-      "attacks": 117,
-      "trades": 21,
-      "colonies": 20,
+      "attacks": 57,
+      "trades": 18,
+      "colonies": 17,
       "alive": 5,
       "viable": 4
     },
@@ -277,19 +277,19 @@
       "seed": 3622803,
       "years": 160,
       "civilizations": 6,
-      "attacks": 87,
-      "trades": 30,
+      "attacks": 38,
+      "trades": 18,
       "colonies": 20,
       "alive": 5,
-      "viable": 5
+      "viable": 3
     },
     {
       "seed": 3623074,
       "years": 160,
       "civilizations": 6,
-      "attacks": 106,
-      "trades": 29,
-      "colonies": 20,
+      "attacks": 68,
+      "trades": 24,
+      "colonies": 21,
       "alive": 6,
       "viable": 5
     },
@@ -297,86 +297,86 @@
       "seed": 3623345,
       "years": 160,
       "civilizations": 6,
-      "attacks": 74,
-      "trades": 44,
-      "colonies": 19,
-      "alive": 6,
-      "viable": 2
+      "attacks": 37,
+      "trades": 24,
+      "colonies": 17,
+      "alive": 5,
+      "viable": 5
     },
     {
       "seed": 3623616,
       "years": 160,
       "civilizations": 6,
-      "attacks": 76,
+      "attacks": 48,
       "trades": 10,
-      "colonies": 20,
+      "colonies": 18,
       "alive": 5,
-      "viable": 1
+      "viable": 3
     },
     {
       "seed": 3623887,
       "years": 160,
       "civilizations": 6,
-      "attacks": 100,
-      "trades": 26,
-      "colonies": 18,
+      "attacks": 35,
+      "trades": 16,
+      "colonies": 19,
       "alive": 5,
-      "viable": 4
+      "viable": 3
     },
     {
       "seed": 3624158,
       "years": 160,
       "civilizations": 6,
-      "attacks": 69,
-      "trades": 13,
-      "colonies": 22,
+      "attacks": 44,
+      "trades": 18,
+      "colonies": 21,
       "alive": 5,
-      "viable": 3
+      "viable": 4
     },
     {
       "seed": 3624429,
       "years": 160,
       "civilizations": 6,
-      "attacks": 94,
-      "trades": 22,
+      "attacks": 32,
+      "trades": 13,
       "colonies": 18,
-      "alive": 6,
-      "viable": 5
+      "alive": 5,
+      "viable": 2
     },
     {
       "seed": 3624700,
       "years": 160,
       "civilizations": 6,
-      "attacks": 27,
-      "trades": 12,
+      "attacks": 29,
+      "trades": 19,
       "colonies": 19,
-      "alive": 3,
+      "alive": 4,
       "viable": 2
     },
     {
       "seed": 3624971,
       "years": 160,
       "civilizations": 6,
-      "attacks": 56,
-      "trades": 14,
-      "colonies": 18,
-      "alive": 2,
-      "viable": 2
+      "attacks": 47,
+      "trades": 27,
+      "colonies": 20,
+      "alive": 4,
+      "viable": 3
     },
     {
       "seed": 3625242,
       "years": 160,
       "civilizations": 6,
-      "attacks": 80,
-      "trades": 15,
-      "colonies": 17,
+      "attacks": 73,
+      "trades": 18,
+      "colonies": 19,
       "alive": 5,
-      "viable": 3
+      "viable": 5
     }
   ],
   "training": {
     "version": "lineage-crossplay-2",
-    "simulatorVersion": "parallax-1",
+    "simulatorVersion": "command-1",
     "seed": 792773,
     "rounds": 7,
     "rollouts": 672,
@@ -395,76 +395,38 @@
         {
           "family": 0,
           "improved": true,
-          "gain": 2.8325,
-          "score": 9.1834
+          "gain": 0.0636,
+          "score": 8.0469
         },
         {
           "family": 1,
           "improved": true,
-          "gain": 3.1963,
-          "score": 10.6575
+          "gain": 5.3234,
+          "score": 7.4434
         },
         {
           "family": 2,
           "improved": true,
-          "gain": 1.7705,
-          "score": 8.1664
+          "gain": 4.3952,
+          "score": 10.6982
         },
         {
           "family": 3,
           "improved": true,
-          "gain": 1.7762,
-          "score": 6.483
+          "gain": 4.238,
+          "score": 10.6832
         },
         {
           "family": 4,
           "improved": true,
-          "gain": 2.627,
-          "score": 4.7236
+          "gain": 4.2491,
+          "score": 10.7388
         },
         {
           "family": 5,
           "improved": true,
-          "gain": 0.0401,
-          "score": 9.107
-        }
-      ],
-      [
-        {
-          "family": 0,
-          "improved": true,
-          "gain": 5.4587,
-          "score": 10.7813
-        },
-        {
-          "family": 1,
-          "improved": true,
-          "gain": 0.054,
-          "score": 10.8549
-        },
-        {
-          "family": 2,
-          "improved": true,
-          "gain": 1.5734,
-          "score": 9.1465
-        },
-        {
-          "family": 3,
-          "improved": true,
-          "gain": 2.6697,
-          "score": 10.6743
-        },
-        {
-          "family": 4,
-          "improved": true,
-          "gain": 3.1288,
-          "score": 7.3552
-        },
-        {
-          "family": 5,
-          "improved": false,
-          "gain": 0,
-          "score": 10.7977
+          "gain": 2.6237,
+          "score": 9.0607
         }
       ],
       [
@@ -472,189 +434,227 @@
           "family": 0,
           "improved": false,
           "gain": 0,
-          "score": 10.7067
+          "score": 8.9931
         },
         {
           "family": 1,
-          "improved": false,
-          "gain": 0,
-          "score": 10.7019
+          "improved": true,
+          "gain": 3.3766,
+          "score": 10.7783
         },
         {
           "family": 2,
-          "improved": false,
-          "gain": 0,
-          "score": 10.7498
+          "improved": true,
+          "gain": 0.0473,
+          "score": 10.8879
         },
         {
           "family": 3,
-          "improved": true,
-          "gain": 2.7044,
-          "score": 10.773
-        },
-        {
-          "family": 4,
           "improved": true,
           "gain": 1.5971,
-          "score": 6.3397
+          "score": 7.4378
+        },
+        {
+          "family": 4,
+          "improved": false,
+          "gain": 0,
+          "score": 10.8488
         },
         {
           "family": 5,
           "improved": true,
-          "gain": 0.0263,
-          "score": 8.0349
+          "gain": 3.2866,
+          "score": 9.0888
         }
       ],
       [
         {
           "family": 0,
           "improved": true,
-          "gain": 1.5845,
-          "score": 9.0966
+          "gain": 2.6099,
+          "score": 8.9323
         },
         {
           "family": 1,
           "improved": true,
-          "gain": 0.1545,
-          "score": 10.9027
+          "gain": 2.7533,
+          "score": 10.7739
         },
         {
           "family": 2,
-          "improved": false,
-          "gain": 0,
-          "score": 10.7503
+          "improved": true,
+          "gain": 0.03,
+          "score": 10.818
         },
         {
           "family": 3,
-          "improved": false,
-          "gain": 0,
-          "score": 10.5937
+          "improved": true,
+          "gain": 0.1443,
+          "score": 9.2094
         },
         {
           "family": 4,
-          "improved": true,
-          "gain": 1.0707,
-          "score": 7.32
+          "improved": false,
+          "gain": 0,
+          "score": 9.0812
         },
         {
           "family": 5,
           "improved": true,
-          "gain": 4.1847,
-          "score": 7.9226
+          "gain": 0.9438,
+          "score": 8.988
         }
       ],
       [
         {
           "family": 0,
           "improved": true,
-          "gain": 3.2061,
-          "score": 10.7661
+          "gain": 1.586,
+          "score": 6.4129
         },
         {
           "family": 1,
           "improved": true,
-          "gain": 0.1169,
-          "score": 10.8534
+          "gain": 0.0166,
+          "score": 10.5889
         },
         {
           "family": 2,
-          "improved": true,
-          "gain": 2.7252,
-          "score": 9.2354
+          "improved": false,
+          "gain": 0,
+          "score": 10.8813
         },
         {
           "family": 3,
           "improved": true,
-          "gain": 1.6026,
-          "score": 10.7035
+          "gain": 0.133,
+          "score": 9.086
         },
         {
           "family": 4,
-          "improved": false,
-          "gain": 0,
-          "score": 7.9218
+          "improved": true,
+          "gain": 0.0616,
+          "score": 9.2645
         },
         {
           "family": 5,
           "improved": true,
-          "gain": 0.1102,
-          "score": 10.7381
+          "gain": 0.0399,
+          "score": 10.6287
         }
       ],
       [
         {
           "family": 0,
           "improved": true,
-          "gain": 4.2103,
-          "score": 10.6672
+          "gain": 1.0675,
+          "score": 4.7417
         },
         {
           "family": 1,
           "improved": true,
-          "gain": 0.0057,
-          "score": 10.8716
+          "gain": 1.5325,
+          "score": 10.758
         },
         {
           "family": 2,
           "improved": true,
-          "gain": 2.6418,
-          "score": 10.6854
+          "gain": 0.0193,
+          "score": 10.883
         },
         {
           "family": 3,
           "improved": true,
-          "gain": 0.0699,
-          "score": 10.8153
+          "gain": 0.1019,
+          "score": 9.1703
         },
         {
           "family": 4,
           "improved": true,
-          "gain": 1.51,
-          "score": 4.7118
+          "gain": 0.0408,
+          "score": 10.6801
         },
         {
           "family": 5,
           "improved": true,
-          "gain": 1.5239,
-          "score": 10.6235
+          "gain": 0.0274,
+          "score": 10.7274
         }
       ],
       [
         {
           "family": 0,
-          "improved": false,
-          "gain": 0,
-          "score": 10.8159
+          "improved": true,
+          "gain": 2.6316,
+          "score": 6.3296
         },
         {
           "family": 1,
           "improved": true,
-          "gain": 1.6741,
-          "score": 10.7818
+          "gain": 0.0147,
+          "score": 10.7759
         },
         {
           "family": 2,
-          "improved": true,
-          "gain": 0.0793,
-          "score": 10.7957
+          "improved": false,
+          "gain": 0,
+          "score": 9.2316
         },
         {
           "family": 3,
           "improved": true,
-          "gain": 1.006,
-          "score": 9.0436
+          "gain": 0.0191,
+          "score": 10.7894
         },
         {
           "family": 4,
           "improved": true,
-          "gain": 1.5571,
-          "score": 7.3587
+          "gain": 2.6984,
+          "score": 10.8065
         },
         {
           "family": 5,
           "improved": false,
           "gain": 0,
-          "score": 10.6825
+          "score": 10.7369
+        }
+      ],
+      [
+        {
+          "family": 0,
+          "improved": true,
+          "gain": 1.0667,
+          "score": 4.8366
+        },
+        {
+          "family": 1,
+          "improved": true,
+          "gain": 4.2398,
+          "score": 9.0744
+        },
+        {
+          "family": 2,
+          "improved": false,
+          "gain": 0,
+          "score": 9.2368
+        },
+        {
+          "family": 3,
+          "improved": true,
+          "gain": 1.5842,
+          "score": 9.1794
+        },
+        {
+          "family": 4,
+          "improved": true,
+          "gain": 0.0514,
+          "score": 10.7886
+        },
+        {
+          "family": 5,
+          "improved": false,
+          "gain": 0,
+          "score": 8.0442
         }
       ]
     ],
@@ -663,28 +663,28 @@
       "description": "Candidate policies retain at least 25% contest probability in the tested desperate, advantageous contest and 20% trade probability for the tested trusted, superior partner. Selection among eligible candidates uses lineage survival. During play every action is sampled from the policy without quotas.",
       "checkpoints": [
         {
-          "contestedRefuge": 0.9999654714391932,
-          "trustedTrade": 0.9994899629763568
+          "contestedRefuge": 0.9781675018806804,
+          "trustedTrade": 0.9982648471139308
         },
         {
-          "contestedRefuge": 0.9994750537306651,
-          "trustedTrade": 0.9999953334907188
+          "contestedRefuge": 0.47012154016036106,
+          "trustedTrade": 0.9974198892689682
         },
         {
-          "contestedRefuge": 0.5429523925493001,
-          "trustedTrade": 0.9583073289946045
+          "contestedRefuge": 0.9999972897695496,
+          "trustedTrade": 0.66975697646987
         },
         {
-          "contestedRefuge": 0.9999587165151343,
-          "trustedTrade": 0.998888993050197
+          "contestedRefuge": 0.9999666814741438,
+          "trustedTrade": 0.45084020940699165
         },
         {
-          "contestedRefuge": 0.9895359013002123,
-          "trustedTrade": 0.31994666930720933
+          "contestedRefuge": 0.9967860429142673,
+          "trustedTrade": 0.8162016579440596
         },
         {
-          "contestedRefuge": 0.9999909005015762,
-          "trustedTrade": 0.40531026682308097
+          "contestedRefuge": 0.9869855619049691,
+          "trustedTrade": 0.31015086762176913
         }
       ]
     },
@@ -930,110 +930,110 @@
     {
       "seed": 912307,
       "initialContests": 22,
-      "finalContests": 69,
+      "finalContests": 40,
       "initialTrades": 210,
-      "finalTrades": 56
+      "finalTrades": 29
     },
     {
       "seed": 912434,
       "initialContests": 26,
-      "finalContests": 52,
+      "finalContests": 66,
       "initialTrades": 114,
-      "finalTrades": 11
+      "finalTrades": 4
     },
     {
       "seed": 912561,
       "initialContests": 11,
-      "finalContests": 102,
+      "finalContests": 52,
       "initialTrades": 237,
-      "finalTrades": 30
+      "finalTrades": 21
     },
     {
       "seed": 912688,
       "initialContests": 31,
-      "finalContests": 97,
+      "finalContests": 61,
       "initialTrades": 275,
-      "finalTrades": 13
+      "finalTrades": 8
     },
     {
       "seed": 912815,
       "initialContests": 9,
-      "finalContests": 113,
+      "finalContests": 72,
       "initialTrades": 238,
-      "finalTrades": 29
+      "finalTrades": 28
     },
     {
       "seed": 912942,
       "initialContests": 27,
-      "finalContests": 83,
+      "finalContests": 54,
       "initialTrades": 328,
-      "finalTrades": 31
+      "finalTrades": 17
     },
     {
       "seed": 913069,
       "initialContests": 9,
-      "finalContests": 62,
+      "finalContests": 25,
       "initialTrades": 251,
-      "finalTrades": 38
+      "finalTrades": 26
     },
     {
       "seed": 913196,
       "initialContests": 27,
-      "finalContests": 65,
+      "finalContests": 56,
       "initialTrades": 308,
-      "finalTrades": 4
+      "finalTrades": 15
     },
     {
       "seed": 913323,
       "initialContests": 31,
-      "finalContests": 85,
+      "finalContests": 59,
       "initialTrades": 223,
-      "finalTrades": 20
+      "finalTrades": 21
     },
     {
       "seed": 913450,
       "initialContests": 7,
-      "finalContests": 55,
+      "finalContests": 17,
       "initialTrades": 232,
-      "finalTrades": 3
+      "finalTrades": 13
     },
     {
       "seed": 913577,
       "initialContests": 27,
-      "finalContests": 108,
+      "finalContests": 60,
       "initialTrades": 229,
-      "finalTrades": 73
+      "finalTrades": 24
     },
     {
       "seed": 913704,
       "initialContests": 18,
-      "finalContests": 82,
+      "finalContests": 44,
       "initialTrades": 223,
-      "finalTrades": 23
+      "finalTrades": 9
     }
   ],
   "adaptationProbe": {
     "method": "Illustrative fixed action menu, varying only acknowledged trade feedback or opposing strength. Values are mean action probabilities across the six checkpoints.",
     "probabilities": {
       "freshContact": {
-        "trade": 0.5602,
-        "contest": 0.1833,
-        "secure": 0.2564
+        "trade": 0.3755,
+        "contest": 0.5486,
+        "secure": 0.0759
       },
       "successfulTrade": {
-        "trade": 0.6521,
-        "contest": 0.1332,
-        "secure": 0.2147
+        "trade": 0.4648,
+        "contest": 0.4801,
+        "secure": 0.0551
       },
       "refusedTrade": {
-        "trade": 0.4229,
-        "contest": 0.2692,
-        "secure": 0.3079
+        "trade": 0.3255,
+        "contest": 0.5844,
+        "secure": 0.0901
       },
       "strongerFoe": {
-        "trade": 0.6283,
-        "contest": 0.0096,
-        "secure": 0.3621
+        "trade": 0.48,
+        "contest": 0.2991,
+        "secure": 0.2209
       }
     }
   }

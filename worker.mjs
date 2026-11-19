@@ -1,13 +1,16 @@
+import { systemReplay } from './system-replay.mjs';
 import { parentPort, workerData } from 'node:worker_threads';
 import { frame, header, indexReplay, chronicle, ledger } from './replay.mjs';
 const { simulate } = await import(workerData.engine);
 const idx = indexReplay(simulate({ ...workerData.config, models: workerData.models, detail: true }));
-const meta = header(idx);
+const physics = idx.run.layouts ? await import(new URL('encounters.mjs', workerData.engine)) : null;
+const meta = { ...header(idx), spatial: !!physics };
 parentPort.postMessage({ ready: meta });
 parentPort.on('message', ({ id, op, args }) => {
   try {
     let data;
-    if (op === 'frame') data = frame(idx, args);
+    if (op === 'system') data = systemReplay(idx.run, args, physics);
+    else if (op === 'frame') data = frame(idx, args);
     else if (op === 'log') data = chronicle(idx, args);
     else if (op === 'ledger') data = ledger(idx, args.month);
     else if (op === 'legal') {

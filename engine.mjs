@@ -1,6 +1,9 @@
+import { cruise, catchSignal, systemLayout, unit, departurePath, routePosition } from './flight.mjs';
+import { commission, directive } from './commanders.mjs';
+import { theater, deploy, advance } from './encounters.mjs';
 import { chooseAction, actionProbabilities, feedbackValue, learnFeedback } from './policy.mjs';
 
-export const RULESET = 'parallax-2';
+export const RULESET = 'command-1';
 export const palette = [
   '#baf186',
   '#7bcafa',
@@ -193,6 +196,28 @@ export function simulate({
     queue = new Map(),
     statistics = [],
     ledgers = [];
+  const layouts = chart.map((_, i) => systemLayout(rng(hash(seed, 'orbits', i))));
+  const operations = new Map(),
+    encounters = chart.map(() => []),
+    captains = new Map(),
+    messages = [];
+  for (const [i, s] of sites.entries()) {
+    s.ruler = s.owner === null ? null : 'home-' + i;
+    s.station = 0;
+    s.facilities = [1, 1, 1];
+    if (s.ruler)
+      captains.set(s.ruler, {
+        id: s.ruler,
+        role: 'ruler',
+        owner: s.owner,
+        site: i,
+        preferences: {},
+        sequence: 0,
+      });
+  }
+  function correspondence(c, time, status, source) {
+    if (detail) messages.push({ controller: c.id, time, status, source });
+  }
   const travellingPopulation = new Float64Array(count);
   let t = 0,
     eventId = 0;
@@ -215,6 +240,9 @@ export function simulate({
         t,
         owner: s.owner,
         since: s.since,
+        ruler: s.ruler,
+        facilities: [...s.facilities],
+        station: s.station,
         pop: round(s.pop),
         reserve: round(s.reserve),
         work: round(s.work),
@@ -449,7 +477,8 @@ export function simulate({
       k = opt.kind,
       owner = s.owner;
     const speed = k === 'contest' || k === 'survey' ? 1 / 3 : 0.2;
-    const end = t + travelMonths(dist[i][j], speed);
+    const path = departurePath(chart[i], chart[j], layouts[i], t, scale, speed);
+    const end = t + path.months;
     const troops = k === 'contest' ? s.guard * 0.72 : k === 'escort' ? Math.min(2, s.guard * 0.25) : 0;
     const settlers =
       k === 'settle'
@@ -485,8 +514,28 @@ export function simulate({
         why,
         tech: s.tech,
       };
+    const captain = commission(
+      key,
+      s.ruler,
+      k,
+      s.policy || models[owner % Math.max(1, models.length)],
+      s.contacts.get(j),
+      rng(hash(seed, key, 'doctrine')),
+    );
+    Object.assign(captain, { owner, site: j, source: i, born: t });
+    captain.archive = new Map([...s.contacts].slice(-8));
+    captain.governance = s.policy || models[owner % Math.max(1, models.length)];
+    captains.set(key, captain);
+    Object.assign(flight, { captain: key, parent: s.ruler, path });
+    correspondence(captain, t, 'Commissioned for ' + names[k], s.ruler);
+    for (const [sequence, when] of [
+      [1, t + Math.max(1, Math.floor((end - t) / 2))],
+      [2, end],
+    ])
+      schedule(when, { type: 'reviewMission', i, flight, sequence });
     schedule(end, flight);
-    if (detail) flights.push({ from: i, to: j, start: t, end, owner, kind: k, why });
+    if (detail)
+      flights.push({ from: i, to: j, start: t, end, owner, kind: k, why, path, commander: key });
     broadcast(i, 'Launch trace', why);
   }
   function act(i, opt, opts, prob, key) {
@@ -494,6 +543,7 @@ export function simulate({
       owner = s.owner,
       k = opt.kind,
       j = opt.target;
+    if (['wait', 'secure', 'research'].includes(k)) s.priority = k;
     const why = record(
       'order',
       i,
@@ -543,6 +593,7 @@ export function simulate({
     } else if (k === 'secure') {
       s.work -= 5;
       s.guard += 2.8;
+      s.station = s.reserve < 28 ? 2 : s.work < 20 ? 1 : 0;
     } else if (k === 'signal') {
       s.work -= 2;
       const peer = s.contacts.get(j)?.owner;
@@ -558,14 +609,28 @@ export function simulate({
       s = sites[i],
       from = sites[j],
       previous = s.owner;
-    if (from.owner === owner) from.pending = Math.max(0, from.pending - 1);
+
     let kind = 'arrival',
       title = 'Survey completed',
       body = chart[i].name + ' was surveyed.',
       reply = 'Survey return',
       bonus = 0;
-    const defense = k === 'contest' && previous !== null && previous !== owner ? s.guard : null;
-    if (k === 'settle') {
+    const defense = k === 'contest' && previous !== null && previous !== owner ? e.defense : null;
+    const captain = captains.get(e.captain);
+    const failed = e.result !== 'dock' && e.result !== 'raid';
+    if (failed && k !== 'contest') {
+      title = e.result === 'lost' ? 'Command ship lost' : 'Mission withdrew';
+      body = 'The expedition did not reach its rendezvous.';
+      if (e.result === 'lost') travellingPopulation[owner] -= e.settlers;
+      else
+        schedule(t + Math.ceil(e.path.duration * 12), {
+          type: 'return',
+          i: j,
+          owner,
+          pop: e.settlers,
+          troops: e.troops,
+        });
+    } else if (k === 'settle') {
       if (s.owner === null) {
         Object.assign(s, {
           owner,
@@ -602,10 +667,15 @@ export function simulate({
       } else {
         title = 'Landing refused';
         body = 'The expedition is returning to ' + chart[j].name + '.';
-        schedule(t + travelMonths(dist[i][j], 0.2), { type: 'return', i: j, owner, pop: e.settlers });
+        schedule(t + Math.ceil(cruise(dist[i][j], 0.2).duration * 12), {
+          type: 'return',
+          i: j,
+          owner,
+          pop: e.settlers,
+        });
       }
     }
-    if (k === 'trade') {
+    if (!failed && k === 'trade') {
       const access = (s.grants.get(owner) ?? -1) >= t,
         trust = s.relations.get(owner) || 0;
       const accepted =
@@ -632,30 +702,46 @@ export function simulate({
         body = 'The carrier found no willing trading partner.';
       }
     }
-    if (k === 'escort') {
+    if (!failed && k === 'escort') {
       if (s.owner === owner) {
         s.reserve += 10;
-        s.guard += e.troops;
+        if (!e.reinforced) s.guard += e.troops;
         title = 'Relief convoy arrived';
         body = 'Stores and escort strength transferred to the settlement.';
       } else {
         title = 'Convoy recalled';
         body = 'Control at the destination changed.';
-        schedule(t + travelMonths(dist[i][j], 0.2), { type: 'return', i: j, owner, troops: e.troops });
+        schedule(t + Math.ceil(cruise(dist[i][j], 0.2).duration * 12), {
+          type: 'return',
+          i: j,
+          owner,
+          troops: e.troops,
+        });
       }
     }
     if (k === 'contest') {
       kind = 'conflict';
-      if (s.owner === owner) {
+      if (e.result === 'raid') {
+        s.facilities[e.facility] = 0;
+        title = 'Facility disabled';
+        body = layouts[i].bodies[e.facility].name + ' went offline. The settlement retained control.';
+        schedule(t + Math.ceil(e.path.duration * 12), {
+          type: 'return',
+          i: j,
+          owner,
+          pop: e.settlers,
+          troops: e.troops,
+        });
+      } else if (!failed && s.owner === owner) {
         s.guard += e.troops;
         title = 'Reinforcements arrived';
         body = 'The site is now under friendly control.';
-      } else if (s.owner !== null && e.troops >= 1.25 * Math.max(0.5, s.guard)) {
+      } else if (s.owner !== null && e.result === 'dock' && e.settlers > 0) {
         civs[s.owner].losses++;
         s.owner = owner;
         s.since = t;
         s.epoch++;
-        s.guard = Math.max(1, e.troops - 0.55 * s.guard);
+        s.guard = e.troops;
         s.reserve *= 0.84;
         s.pending = 0;
         s.contacts.clear();
@@ -670,35 +756,65 @@ export function simulate({
         reply = 'Control confirmed';
       } else {
         const defended = s.owner !== null;
-        s.guard = Math.max(0, s.guard - e.troops * 0.48);
+
         if (defended) s.relations.set(owner, -0.72);
         title = defended ? 'Expedition repelled' : 'Expedition withdrew';
-        body = defended
-          ? 'The local garrison retained control. Survivors are returning.'
+        body = e.result==='lost'
+          ? 'The command ship was lost before it could occupy the orbital port.'
+          : defended
+          ? 'The settlement retained control. The expedition is returning.'
           : 'The site was unoccupied when the expedition arrived.';
         reply = title;
-        schedule(t + travelMonths(dist[i][j], 1 / 3), {
-          type: 'return',
-          i: j,
-          owner,
-          troops: e.troops * (defended ? 0.42 : 1),
-          pop: e.settlers,
-        });
+        if (e.result === 'lost') travellingPopulation[owner] -= e.settlers;
+        else
+          schedule(t + Math.ceil(e.path.duration * 12), {
+            type: 'return',
+            i: j,
+            owner,
+            troops: e.troops,
+            pop: e.settlers,
+          });
       }
-      if (s.owner === owner && e.settlers) {
+      if (e.result === 'dock' && s.owner === owner && e.settlers) {
         s.pop += e.settlers;
         s.lineages[owner] = (s.lineages[owner] || 0) + e.settlers;
         travellingPopulation[owner] -= e.settlers;
       }
     }
+    if (previous !== s.owner && s.owner === owner) {
+      if(s.ruler)captains.get(s.ruler).role='retired';
+      s.priority = 'wait';
+      s.ruler = captain.id;
+      captain.role = 'ruler';
+      captain.promoted = t;
+      s.contacts = new Map(captain.archive);
+      s.contacts.delete(i);
+      s.policy = structuredClone(captain.governance);
+      if (s.policy?.bias) {
+        s.policy.aptitude = [...captain.weights];
+        s.policy.aptitude[3] = clamp(s.policy.aptitude[3] + 0.15 * (captain.preferences.Intercept || 0));
+        s.policy.bias[5] += 0.3 * (captain.preferences.Rendezvous || 0);
+        s.policy.bias[7] += 0.3 * (captain.preferences.Screen || 0);
+      }
+
+      s.feedback = new Map(
+        Object.entries(captain.preferences).map(([action, value]) => [
+          action + ':' + i,
+          { month: t, value },
+        ]),
+      );
+      correspondence(captain, t, 'Assumed local government', captain.id);
+    } else captain.role = e.result === 'lost' ? 'lost' : 'returned';
     const local = record(kind, i, s.owner ?? owner, title, body, {
+      commander: e.captain,
+      encounter: e.encounter,
       actor: owner,
       target: j,
       action: k,
       sourceEvent: e.why,
       previous,
       ...(detail && defense !== null
-        ? { combat: { attack: round(e.troops), defense: round(defense) } }
+        ? { combat: { attack: round(e.attack), defense: round(defense) } }
         : {}),
     });
     if (s.owner !== null && s.owner !== owner)
@@ -723,27 +839,198 @@ export function simulate({
                 ? 0.7
                 : -0.6
               : 0.35;
-    schedule(t + travelMonths(dist[i][j], 1), {
-      type: 'reply',
-      i: j,
-      j: i,
-      data: intel(i),
-      origin: t,
-      owner,
-      k,
-      outcome,
-      source: reply,
-      why: local,
-      relation: k === 'contest' ? -0.32 : k === 'trade' && bonus ? 0.12 : 0,
-    });
+    if (e.result !== 'lost')
+      schedule(t + travelMonths(dist[i][j], 1), {
+        type: 'reply',
+        recipient: e.parent,
+        sender: e.captain,
+        i: j,
+        j: i,
+        data: failed ? null : intel(i),
+        origin: t,
+        owner,
+        k,
+        outcome,
+        source: reply,
+        why: local,
+        relation: k === 'contest' ? -0.32 : k === 'trade' && bonus ? 0.12 : 0,
+      });
     if (bonus)
-      schedule(t + travelMonths(dist[i][j], 0.2), { type: 'return', i: j, owner, supply: bonus });
+      schedule(t + Math.ceil(cruise(dist[i][j], 0.2).duration * 12), {
+        type: 'return',
+        i: j,
+        owner,
+        supply: bonus,
+      });
     snapshot(i);
+  }
+  function enterSystem(e) {
+    const i = e.i,
+      s = sites[i];
+    let active = operations.get(i);
+    if (!active) {
+      const tape = { start: t, end: t, inputs: [] };
+      active = { tape, scene: theater(layouts[i], t), flights: new Map() };
+      operations.set(i, active);
+      if (detail) encounters[i].push(tape);
+    }
+    function join(entry) {
+      if (detail) active.tape.inputs.push({ time: t, entry: structuredClone(entry) });
+      deploy(active.scene, entry);
+    }
+    e.defense =
+      s.guard +
+      active.scene.ships
+        .filter((h) => h.owner === s.owner)
+        .reduce((sum, h) => sum + h.power * h.hull, 0);
+    e.attack = e.troops;
+    if (e.k === 'contest' && s.owner !== null && s.owner !== e.owner && s.guard > 0.01) {
+      const c = commission(
+        s.ruler,
+        s.ruler,
+        'secure',
+        s.policy || models[s.owner % Math.max(1, models.length)],
+        null,
+        rng(hash(seed, t, i)),
+      );
+      join({
+        captain: c,
+        owner: s.owner,
+        strength: s.guard,
+        kind: 'defend',
+        station: s.station,
+        direction: [1, 0, 0],
+      });
+      s.guard = 0;
+    }
+    active.flights.set(e.captain, e);
+    const { governance, archive, ...localCaptain } = captains.get(e.captain);
+    join({
+      captain: localCaptain,
+      owner: e.owner,
+      strength: e.troops,
+      kind: e.k,
+      clock: e.path.properYears * 12,
+      direction: unit(['x', 'y', 'z'].map((axis) => chart[e.j][axis] - chart[i][axis])),
+    });
+    e.encounter = active.tape.start;
+  }
+  function stepSystems() {
+    for (const [i, active] of operations) {
+      const { scene, tape, flights: pending } = active,
+        s = sites[i];
+      while (scene.time < t && pending.size) {
+        const owner = s.owner;
+        if (tape.inputs.at(-1)?.owner !== owner && active.lastOwner !== owner) {
+          tape.inputs.push({ time: scene.time, owner });
+          active.lastOwner = owner;
+        }
+        for (const { mission, result, facility, reinforced } of advance(scene, owner)) {
+          const e = pending.get(mission.captain.id);
+          pending.delete(e.captain);
+          Object.assign(captains.get(e.captain).preferences, mission.captain.preferences);
+          e.troops = mission.ships.reduce((n, h) => n + h.power * h.hull, 0);
+          arrive({ ...e, result, facility, reinforced });
+        }
+      }
+      tape.end = scene.time;
+      if (!pending.size) {
+        for (const h of scene.ships) if (h.owner === s.owner) s.guard += h.hull * h.power;
+        operations.delete(i);
+        snapshot(i);
+      }
+    }
+  }
+  function sendCouncil(from, to, recipient, kind, payload = {}) {
+    const sender = sites[from].ruler;
+    const arrival = t + travelMonths(dist[from][to], 1);
+    correspondence(captains.get(sender), t, kind + ' sent', recipient);
+    schedule(arrival, {
+      ...payload,
+      type: 'council',
+      kind,
+      i: to,
+      j: from,
+      sender,
+      recipient,
+      origin: t,
+    });
+    if (detail)
+      flights.push({ from, to, start: t, end: arrival, owner: sites[from].owner, kind: 'signal' });
+  }
+  function receiveCouncil(e) {
+    const s = sites[e.i];
+    if (s.ruler !== e.recipient || s.owner === null) return;
+    const ruler = captains.get(s.ruler);
+    correspondence(ruler, t, e.kind + ' received', e.sender);
+    if (e.kind === 'Governor report') {
+      updateContact(e.i, e.j, e.data, e.origin, e.kind);
+      sendCouncil(e.i, e.j, e.sender, 'Council directive', {
+        priority: s.priority || 'wait',
+        expires: t + 120,
+      });
+    } else if (e.kind === 'Council directive') {
+      const fresh = e.origin > (ruler.lastDirective ?? -1);
+      const legal = options(e.i).some((o) => o.target === e.i && o.kind === e.priority);
+      const accepted = fresh && t <= e.expires && legal;
+      const status = !fresh ? 'superseded' : accepted ? 'accepted' : 'rejected';
+      ruler.lastDirective = Math.max(e.origin, ruler.lastDirective ?? -1);
+      if (accepted) learnFeedback(s.feedback, e.priority, e.i, t, 0.9);
+      correspondence(ruler, t, names[e.priority] + ' · ' + status, e.sender);
+      sendCouncil(e.i, e.j, e.sender, 'Directive ' + status);
+    }
   }
   function deliver(e) {
     const s = sites[e.i];
+    if (e.type === 'council') {
+      receiveCouncil(e);
+      return;
+    }
+    if (e.type === 'reviewMission') {
+      const f = e.flight,
+        c = captains.get(f.captain);
+      if (
+        s.ruler === f.parent &&
+        (s.reserve < 8 || (f.k === 'contest' && s.contacts.get(f.i)?.owner === f.owner))
+      ) {
+        const at = (t - f.origin) / 12;
+        const receive =
+          f.origin +
+          Math.ceil(
+            12 *
+              catchSignal(f.path, at, (_, years) => {
+                const p = routePosition(f.path, years),
+                  origin = chart[e.i];
+                return scale * Math.hypot(p[0] - origin.x, p[1] - origin.y, p[2] - origin.z);
+              }),
+          );
+        correspondence(captains.get(s.ruler), t, 'Recall transmitted', c.id);
+        schedule(Math.max(t + 1, receive), {
+          type: 'directive',
+          i: f.i,
+          id: c.id,
+          source: s.ruler,
+          sequence: e.sequence,
+          expires: t + Math.ceil(f.path.duration * 24),
+        });
+      }
+      return;
+    }
+    if (e.type === 'directive') {
+      const c = captains.get(e.id);
+      if(c.role!=='commander' && c.role!=='ruler')return;
+      const status = directive(c, { sequence: e.sequence, expires: e.expires }, t);
+      correspondence(c, t, 'Recall ' + status, e.source);
+      const active = operations.get(e.i);
+      const mission = active?.scene.missions.find((m) => m.captain.id === c.id);
+      if (mission && c.recall) {
+        mission.captain.recall = true;
+        active.tape.inputs.push({ time: t, recall: c.id });
+      }
+      return;
+    }
     if (e.type === 'arrival') {
-      arrive(e);
+      enterSystem(e);
       return;
     }
     if (e.type === 'return' && e.pop) travellingPopulation[e.owner] -= e.pop;
@@ -766,7 +1053,18 @@ export function simulate({
       s.relations.set(e.data.owner, clamp((s.relations.get(e.data.owner) || 0) + 0.07, -0.8, 0.5));
     } else if (s.owner === e.owner) {
       if (e.type === 'reply') {
+        if (s.ruler !== e.recipient) return;
+        s.pending = Math.max(0, s.pending - 1);
+        correspondence(captains.get(s.ruler), t, e.source, e.sender);
         learnFeedback(s.feedback, e.k, e.j, t, e.outcome);
+        if (!e.data) {
+          record('receipt', e.i, s.owner, e.source, 'The commander reported its withdrawal.', {
+            target: e.j,
+            origin: e.origin,
+            sourceEvent: e.why,
+          });
+          return;
+        }
         if ((s.contacts.get(e.j)?.origin ?? -Infinity) > e.origin)
           record(
             'receipt',
@@ -836,6 +1134,7 @@ export function simulate({
           },
         );
   for (t = 1; t <= years * 12; t++) {
+    stepSystems();
     const due = queue.get(t);
     if (due) {
       due.sort(
@@ -855,7 +1154,7 @@ export function simulate({
           clamp(1.22 - (0.79 * age) / s.depletion, 0.24, 1.22) *
           chart[i].richness *
           (s.tech & 8 ? 1.45 : 1);
-      const supplyProduction = capacity * Math.min(1.6, s.pop / 60);
+      const supplyProduction = s.facilities[2] * capacity * Math.min(1.6, s.pop / 60);
       s.reserve = Math.min(110, s.reserve + supplyProduction - 0.012 * s.pop - 0.018 * s.guard);
       if (s.reserve < 0) {
         const lost = Math.min(s.pop, Math.max(0.04, -s.reserve * 0.8));
@@ -869,7 +1168,20 @@ export function simulate({
         for (const id of Object.keys(s.lineages)) s.lineages[id] *= 1.0012;
         s.pop += growth;
       }
-      s.work = Math.min(64, s.work + 0.17 + 1.12 * Math.min(1.3, s.pop / 95));
+      s.work = Math.min(64, s.work + 0.17 + s.facilities[1] * 1.12 * Math.min(1.3, s.pop / 95));
+      const repair = s.facilities.indexOf(0);
+      if (repair >= 0 && s.work >= 10 && t % 6 === 0) {
+        s.work -= 10;
+        s.facilities[repair] = 1;
+        record(
+          'repair',
+          i,
+          s.owner,
+          'Facility restored',
+          layouts[i].bodies[repair].name + ' resumed production.',
+        );
+        snapshot(i);
+      }
       s.mature =
         s.reserve >= 0.012 * s.pop * 12 && supplyProduction >= s.pop * 0.012
           ? Math.min(60, s.mature + 1)
@@ -883,6 +1195,8 @@ export function simulate({
           'Local stores and population fell below the recovery threshold.',
         );
         s.owner = null;
+        if(s.ruler)captains.get(s.ruler).role='retired';
+        s.ruler = null;
         s.pop = 0;
         s.guard = 0;
         s.lineages = {};
@@ -892,6 +1206,11 @@ export function simulate({
         continue;
       }
       if (t >= s.pulse) {
+        const ruler = captains.get(s.ruler);
+        if (ruler?.parent && t - (ruler.lastDispatch ?? ruler.promoted) >= 120) {
+          sendCouncil(i, ruler.source, ruler.parent, 'Governor report', { data: intel(i) });
+          ruler.lastDispatch = t;
+        }
         broadcast(i, 'Industrial trace', -1);
         s.pulse = t + 36 + Math.floor(emitRoll('pulse', t, i) * 48);
       }
@@ -913,7 +1232,7 @@ export function simulate({
       if (t >= s.next) {
         const opts = options(i),
           key = [t, i, s.owner].join('-'),
-          m = models[s.owner % Math.max(models.length, 1)],
+          m = s.policy || models[s.owner % Math.max(models.length, 1)],
           random = rng(hash(seed, 'policy', key));
         let ix = chooseAction({ options: opts }, m, random);
         const replace = overrides[key];
@@ -962,6 +1281,24 @@ export function simulate({
   };
   return detail
     ? {
+        profiles: Object.fromEntries(
+          [...captains].map(([id, c]) => [
+            id,
+            {
+              id,
+              parent: c.parent,
+              owner: c.owner,
+              born: c.born || 0,
+              site: c.site,
+              doctrine: c.doctrine,
+              order: c.order,
+              promoted: c.promoted,
+            },
+          ]),
+        ),
+        layouts,
+        encounters,
+        messages,
         version: RULESET,
         seed,
         count,

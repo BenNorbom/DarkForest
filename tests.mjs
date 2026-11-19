@@ -30,7 +30,7 @@ test('a six-light-year route distinguishes departure, receipt, and arrival', () 
       b = replay.chart[f.to];
     const d = Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z) * replay.scale;
     const speed = f.kind === 'signal' ? 1 : ['survey', 'contest'].includes(f.kind) ? 1 / 3 : 0.2;
-    assert.equal(f.end - f.start, travelMonths(d, speed));
+    assert.equal(f.end - f.start, f.path ? f.path.months : travelMonths(d, speed));
   }
 });
 test('local views begin without hidden settlements and reveal only delivered reports', () => {
@@ -158,7 +158,13 @@ test('observer highlights cross systems and keep the requested playback time', (
 test('news tracks the timeline and respects the local receiver', () => {
   const month = cfg.years * 12;
   const galaxy = frame(index, { month });
-  assert.deepEqual(galaxy.news.map((e) => e.id), index.salient.slice(-24).reverse().map((e) => e.id));
+  assert.deepEqual(
+    galaxy.news.map((e) => e.id),
+    index.salient
+      .slice(-24)
+      .reverse()
+      .map((e) => e.id),
+  );
   assert.ok(new Set(galaxy.news.map((e) => e.site)).size > 1);
   assert.ok(galaxy.systems.every((s) => s.z === replay.chart[s.id].z));
   const first = index.localNews[0][0];
@@ -166,4 +172,174 @@ test('news tracks the timeline and respects the local receiver', () => {
   const local = frame(index, { month: first.t, lens: 0, site: 1 });
   assert.ok(local.news.some((e) => e.id === first.id));
   assert.ok(local.news.every((e) => e.site === 0 && e.t <= first.t));
+});
+
+import {
+  cruise,
+  cruiseState,
+  catchSignal,
+  systemLayout,
+  orbit,
+  departurePath,
+  routePosition,
+} from './flight.mjs';
+import { theater, deploy, advance, visibleShips } from './encounters.mjs';
+import { commission, directive, adapt } from './commanders.mjs';
+import { systemReplay } from './system-replay.mjs';
+import { rng } from './engine.mjs';
+
+test('cruise clocks, sublight velocities, moving receivers and orbital periods', () => {
+  for (const d of [0.001, 6]) {
+    const path = cruise(d, 1 / 3);
+    assert.ok(path.properYears < path.duration && path.duration > d * 3);
+    for (const t of [path.ramp, path.duration - path.ramp]) {
+      const before = cruiseState(path, t - 1e-8),
+        after = cruiseState(path, t + 1e-8);
+      assert.ok(
+        Math.abs(before.speed - after.speed) < 1e-6 && Math.abs(before.fraction - after.fraction) < 1e-5,
+      );
+      assert.ok(after.speed < 1);
+    }
+    const sent = path.duration * 0.25,
+      received = catchSignal(path, sent, (x) => x * d);
+    assert.ok(Math.abs(received - sent - cruiseState(path, received).fraction * d) < 1e-9);
+    assert.equal(cruiseState(path, path.duration).fraction, 1);
+  }
+  const layout = systemLayout(rng(17)),
+    period = 12 * Math.sqrt(layout.bodies[0].radius ** 3 / layout.mass);
+  assert.ok(orbit(layout, 0, period).p.every((n, i) => Math.abs(n - orbit(layout, 0, 0).p[i]) < 1e-10));
+});
+
+function engagement(start, multi = false) {
+  const events = [],
+    layout = systemLayout(rng(17)),
+    scene = theater(layout, start, (e) => events.push(e));
+  const send = (id, owner, kind, strength, direction, raid = false) => {
+    const captain = commission(id, 'home', kind, {}, raid ? { guard: 80 } : null, () => 0.5);
+    if (raid) {
+      captain.doctrine = 'Pathfinder';
+      captain.weights[4] = 1;
+    }
+    deploy(scene, { captain, owner, kind, strength, direction, station: 0 });
+  };
+  send('home', 1, 'defend', 6, [1, 0, 0]);
+  send('exp', 0, 'contest', 7, [1, 0, 0], multi);
+  if (multi) send('rival', 2, 'contest', 4, [0, 0, 1]);
+  const results = [];
+  let drift = false;
+  for (let i = 0; i < 250; i++) {
+    if (i === 5 && multi) send('relief', 1, 'escort', 2, [-1, 0, 0]);
+    const disabled = scene.ships.find((h) => h.drive === 0 && h.hull > 0);
+    const position = disabled?.p;
+    results.push(...advance(scene, 1));
+    if (disabled && disabled.p !== position && disabled.p.some((v, j) => v !== position[j]))
+      drift = true;
+  }
+  return { events, results, drift };
+}
+test('changing orbital phase changes interceptions and landing with identical fleets', () => {
+  const a = engagement(0),
+    b = engagement(16);
+  assert.equal(a.results[0].result, 'dock');
+  assert.equal(b.results[0].result, 'lost');
+  assert.notDeepEqual(
+    a.events.find((e) => e.kind === 'contact').at,
+    b.events.find((e) => e.kind === 'contact').at,
+  );
+});
+test('simultaneous rivals, relief, drifting damaged hulls and an independent raid', () => {
+  const e = engagement(0, true);
+  assert.ok(e.drift);
+  assert.ok(e.results.some((r) => r.mission.kind === 'escort' && r.result === 'dock'));
+  assert.ok(e.results.some((r) => r.result === 'raid' && r.facility === 1));
+  assert.ok(e.events.some((event) => event.kind === 'impact'));
+});
+test('a promoted controller retains private adaptation and rejects a late recall', () => {
+  const c = commission('exp', 'home', 'contest', {}, { guard: 3 }, () => 0.5);
+  adapt(c, 'Intercept', 1);
+  const memory = { ...c.preferences };
+  c.role = 'ruler';
+  assert.equal(directive(c, { sequence: 2, expires: 200 }, 100), 'rejected');
+  assert.equal(directive(c, { sequence: 1, expires: 200 }, 101), 'superseded');
+  assert.equal(c.recall, undefined);
+  assert.deepEqual(c.preferences, memory);
+});
+test('orbital replay respects receiver, timestamps, archived runs and stable commander identity', () => {
+  const physics = { theater, advance, deploy, visibleShips };
+  const event = replay.events.find((e) => e.encounter != null && e.combat);
+  const args = { site: event.site, month: event.t, start: event.encounter, lens: -1 };
+  const full = systemReplay(replay, args, physics);
+  assert.ok(full.frames.length > 1 && full.events.length);
+  assert.ok(full.events.every((e) => e.time <= event.t));
+  assert.ok(full.frames.some((f) => f.ships.some((s) => s.controller === event.commander)));
+  const privateView = systemReplay(replay, { ...args, controller: event.commander }, physics);
+  assert.ok(privateView.events.every((e) => e.controller === event.commander));
+  assert.ok(
+    privateView.frames.every((f) =>
+      f.ships.every((s) => s.controller === event.commander || s.fuel === undefined),
+    ),
+  );
+  const remote = systemReplay(replay, { ...args, lens: (event.site + 1) % cfg.systems }, physics);
+  assert.deepEqual(remote.frames, []);
+  assert.equal(remote.facilities, null);
+  assert.deepEqual(systemReplay({}, args, null), { available: false });
+  const transfer = replay.events.find((e) => e.title === 'Control transferred');
+  assert.ok(transfer && replay.profiles[transfer.commander].promoted === transfer.t);
+  assert.equal(
+    replay.history[transfer.site].findLast((h) => h.t <= transfer.t).ruler,
+    transfer.commander,
+  );
+});
+
+test('a capture report travels home while the promoted commander governs independently', () => {
+  const r = simulate({ seed: 1, scenario: 'corridor', count: 8, systems: 32, years: 150 });
+  const win = r.events.find(
+    (e) =>
+      e.title === 'Control transferred' &&
+      r.messages.some(
+        (m) => m.controller === e.commander && m.status === 'Recall rejected' && m.time >= e.t,
+      ),
+  );
+  assert.ok(win);
+  const captain = r.profiles[win.commander];
+  const delivered = r.messages.find(
+    (m) =>
+      m.controller === captain.parent &&
+      m.source === captain.id &&
+      m.status.includes('Control transferred'),
+  );
+  assert.ok(delivered);
+  const a = r.chart[win.site],
+    b = r.chart[win.target];
+  const delay = travelMonths(Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z) * r.scale, 1);
+  assert.equal(delivered.time, win.t + delay);
+  const council = r.messages.find((m) => m.status === 'Council directive received');
+  assert.ok(council);
+  const sent = r.messages.find(
+    (m) =>
+      m.controller === council.source &&
+      m.source === council.controller &&
+      m.status === 'Council directive sent' &&
+      m.time < council.time,
+  );
+  assert.ok(sent);
+  assert.equal(r.history[win.site].findLast((h) => h.t <= win.t).ruler, captain.id);
+});
+
+test('interstellar braking joins the local system at its actual entry position and velocity', () => {
+  const layout = systemLayout(rng(9)),
+    a = { x: 0, y: 1, z: 2 },
+    b = { x: 4, y: 5, z: 7 },
+    mapScale = 0.34;
+  const path = departurePath(a, b, layout, 17, mapScale, 1 / 3);
+  assert.deepEqual(routePosition(path, 0), path.start);
+  const entry = routePosition(path, path.duration),
+    center = [b.x, b.y, b.z];
+  assert.ok(
+    entry.every(
+      (v, i) => Math.abs((v - center[i]) * mapScale * 63241.077 - 5.4 * path.direction[i]) < 1e-7,
+    ),
+  );
+  assert.equal(cruiseState(path, path.duration).speed, 0);
+  assert.ok(path.speed <= 1 / 3);
 });

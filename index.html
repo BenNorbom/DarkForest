@@ -317,6 +317,8 @@
               <label class="follow-toggle"
                 ><input id="followAction" type="checkbox" /> Follow action</label
               >
+              <button id="chartSystem" hidden>System view</button>
+              <button id="jumpBattle" hidden>Next battle</button>
               <button id="fullscreenMap" aria-pressed="false">Fullscreen</button>
             </div>
           </div>
@@ -337,11 +339,13 @@
               <span><i class="legend-home"></i> Home system</span
               ><span><i class="legend-fleet"></i> Fleet</span
               ><span><i class="legend-signal"></i> Signal</span>
+              <span id="conflictKey" hidden><i class="legend-conflict"></i> Contested</span>
             </div>
             <div class="map-buttons">
               <button id="zoomOut" aria-label="Zoom out">−</button
               ><button id="zoomIn" aria-label="Zoom in">+</button
-              ><button id="fitMap" aria-label="Fit galaxy">Fit</button>
+              ><button id="routeFilter" aria-pressed="false" title="Show traffic for the selected star">Local routes</button>
+              <button id="fitMap" aria-label="Fit galaxy">Fit</button>
             </div>
           </div>
           <section class="transport" aria-label="Playback controls">
@@ -391,7 +395,7 @@
                 <small class="muted" id="faction">Awaiting telemetry</small>
               </div>
               <label class="screen-reader" for="siteSelect">Inspect system</label
-              ><select id="siteSelect"></select>
+              ><select id="siteSelect"></select><button id="openSystem" class="orbit-open" hidden>Explore system ↗</button>
               <div class="readout-grid" id="readouts"></div>
               <div class="facts" id="siteFacts"></div>
               <div class="sectionline">

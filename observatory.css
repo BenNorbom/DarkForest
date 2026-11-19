@@ -981,3 +981,30 @@ dialog::backdrop {
     scroll-behavior: auto !important;
   }
 }
+
+#dialog:has(#orbitalView){width:min(1020px,95vw);max-width:95vw;background:#101f2a;color:#e1eeec}
+.orbit-open{margin:8px 0;color:#abeee0;border-color:#487b77}
+#routeFilter[aria-pressed=true]{color:#b6f3de;border-color:#8bc9ba;background:#163b3a}
+.orb-head,.orb-tools,.orb-transport{display:flex;align-items:center;gap:14px}
+.orb-head{justify-content:space-between}.orb-head h2{margin:.15em 0;font-size:clamp(25px,4vw,40px);letter-spacing:-.035em}
+.orb-head time,.orb-transport output{font:12px monospace;color:#a5c8c6}
+.orb-tools{flex-wrap:wrap;margin:10px 0 14px}.orb-tools label{flex:1;min-width:125px;color:#c5d7dc;font-size:12px}
+.orb-tools select{display:block;width:100%;margin-top:5px}
+#orbitalView canvas{display:block;width:100%;height:clamp(240px,45vh,520px);border:1px solid #36505d;border-radius:10px;touch-action:none;cursor:grab}
+#orbitalView canvas:active{cursor:grabbing}.orb-transport{margin:10px 0}.orb-transport input{flex:1;min-width:40px;accent-color:#94ddc8}
+.orb-readout{display:grid;grid-template-columns:1.4fr 1fr;gap:20px;border-top:1px solid #32444e}
+.orb-readout h3{font-size:14px}.orb-readout ol{padding:0;list-style:none;font-size:12px;color:#b9cbd0}
+.orb-readout li{padding:4px 0}.telemetry p{display:flex;justify-content:space-between;gap:8px;margin:5px 0;font-size:12px}
+@media(max-width:560px){.orb-readout{grid-template-columns:1fr;gap:2px}.orb-tools{gap:6px}.orb-tools label{min-width:100px}}
+
+#dialog:has(#orbitalView){max-height:min(94svh,1050px)}
+.orb-head time{margin-right:44px}
+.orb-transport[hidden]{display:none}
+#jumpBattle{border-color:#856749;color:#f2c5a4}
+
+.orb-mail{border-top:1px solid #32444e;padding:.65rem 0;color:#c2d6d7;font-size:.84rem}
+.orb-mail summary{cursor:pointer}.orb-mail ul{max-height:12rem;overflow:auto;padding-left:1.1rem}
+.orb-mail li{padding:.25rem 0}
+
+.map-legend .legend-conflict{height:9px;width:9px;border:1.5px dashed #ffac78;border-radius:50%}
+.map-legend span[hidden]{display:none}

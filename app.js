@@ -1,3 +1,5 @@
+import {cruiseState} from './flight.mjs';
+import {mountSystem} from './system-view.js';
 import { createStarMap } from './starfield.js';
 const $ = (id) => document.getElementById(id);
 const labels = {
@@ -112,6 +114,7 @@ function modal(html) {
   if (!$('dialog').open) $('dialog').showModal();
 }
 function close() {
+  cancelSystemView();
   if ($('dialog').open) $('dialog').close();
 }
 hook('closeDialog', close);
@@ -188,11 +191,55 @@ function eventList(items) {
         .join('')
     : '<p class="minor">No entries at this date.</p>';
 }
+let localRoutes = false;
+hook('routeFilter', () => {
+  localRoutes = !localRoutes;
+  $('routeFilter').setAttribute('aria-pressed', localRoutes);
+  drawMap();
+});
+let systemRequest = 0,
+  disposeSystem;
+function cancelSystemView() {
+  systemRequest++;
+  disposeSystem?.();
+  disposeSystem = null;
+}
+$('dialog').addEventListener('cancel',cancelSystemView);
+async function openSystem(site = selected, when = month, start, controller) {
+  stop();
+  const token = ++systemRequest;
+  const args = { site, month: when, lens };
+  if (start != null) args.start = start;
+  if (controller) args.controller = controller;
+  const data = await api(endpoint('system', args));
+  if (token !== systemRequest || !data.available) return;
+  disposeSystem?.();
+  modal('<section id="orbitalView"></section>');
+  disposeSystem = mountSystem($('orbitalView'), data, {
+    controller,
+    local: lens >= 0,
+    change: (s, c) => openSystem(site, when, s, c),
+    date,
+    colors: frame.systems,
+  });
+}
+hook('openSystem', () => openSystem());
+hook('chartSystem', () => openSystem());
+hook('jumpBattle', async () => {
+  const battle = frame?.nextBattle;
+  if (!battle) return;
+  selected = battle.site;
+  await goto(battle.t);
+  chart.focus(selected);
+  await openSystem(battle.site, battle.t, battle.start);
+});
 function drawMap(year = month / 12) {
   if (!frame) return;
   const signals = signalReplay ? [...frame.signals, signalReplay] : frame.signals;
   chart.draw({
     ...frame,
+    localRoutes,
+    distanceScale: meta.scale,
     mapId: [meta.version, meta.seed, meta.scenario, meta.systems].join('/'),
     year,
     selected,
@@ -284,10 +331,24 @@ function renderFrame() {
       ' · ' +
       (track.end - frame.year).toFixed(1) +
       ' yr to arrival';
+  if (track?.path) {
+    const journey = cruiseState(track.path, frame.year - track.start);
+    route.textContent +=
+      ' · ' +
+      journey.phase +
+      ' · ' +
+      journey.speed.toFixed(2) +
+      ' c · Ship clock ' +
+      journey.shipYears.toFixed(1) +
+      ' yr';
+  }
   $('runSummary').textContent =
     lens < 0
       ? meta.count + ' civilizations  /  ' + meta.systems + ' star systems  /  seed ' + meta.seed
       : meta.systems + ' mapped stars  /  ' + meta.chart[lens].name + ' intelligence';
+  $('openSystem').hidden = $('chartSystem').hidden = !meta.spatial;
+  $('jumpBattle').hidden = !frame.nextBattle;
+  $('conflictKey').hidden=!frame.systems.some(s=>s.contested);
   $('sysTitle').textContent = s.name;
   $('faction').textContent = s.known ? s.faction || 'Unoccupied system' : 'No local identification';
   const readouts = [
@@ -551,11 +612,13 @@ async function inspectEvent(e) {
         : '') +
       '<div class="row">' +
       btn('viewMoment', 'Show this moment') +
+      (e.encounter!=null?btn('openEncounter','View orbital record'):'') +
       (canTrace ? btn('traceLight', 'Follow signal in galaxy view') : '') +
       (e.decision ? btn('viewDecision', 'Inspect order') : '') +
       (f.source ? btn('viewCause', 'Open source event') : '') +
       '</div>',
   );
+  if(e.encounter!=null)hook('openEncounter',()=>openSystem(e.site,e.t,e.encounter));
   hook('viewMoment', async () => {
     close();
     selected = e.site;

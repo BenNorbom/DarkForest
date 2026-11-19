@@ -3,7 +3,7 @@
   "algorithm": "Population-based evolutionary policy search",
   "training": {
     "version": "lineage-crossplay-2",
-    "simulatorVersion": "parallax-1",
+    "simulatorVersion": "command-1",
     "seed": 792773,
     "rounds": 7,
     "rollouts": 672,
@@ -22,76 +22,38 @@
         {
           "family": 0,
           "improved": true,
-          "gain": 2.8325,
-          "score": 9.1834
+          "gain": 0.0636,
+          "score": 8.0469
         },
         {
           "family": 1,
           "improved": true,
-          "gain": 3.1963,
-          "score": 10.6575
+          "gain": 5.3234,
+          "score": 7.4434
         },
         {
           "family": 2,
           "improved": true,
-          "gain": 1.7705,
-          "score": 8.1664
+          "gain": 4.3952,
+          "score": 10.6982
         },
         {
           "family": 3,
           "improved": true,
-          "gain": 1.7762,
-          "score": 6.483
+          "gain": 4.238,
+          "score": 10.6832
         },
         {
           "family": 4,
           "improved": true,
-          "gain": 2.627,
-          "score": 4.7236
+          "gain": 4.2491,
+          "score": 10.7388
         },
         {
           "family": 5,
           "improved": true,
-          "gain": 0.0401,
-          "score": 9.107
-        }
-      ],
-      [
-        {
-          "family": 0,
-          "improved": true,
-          "gain": 5.4587,
-          "score": 10.7813
-        },
-        {
-          "family": 1,
-          "improved": true,
-          "gain": 0.054,
-          "score": 10.8549
-        },
-        {
-          "family": 2,
-          "improved": true,
-          "gain": 1.5734,
-          "score": 9.1465
-        },
-        {
-          "family": 3,
-          "improved": true,
-          "gain": 2.6697,
-          "score": 10.6743
-        },
-        {
-          "family": 4,
-          "improved": true,
-          "gain": 3.1288,
-          "score": 7.3552
-        },
-        {
-          "family": 5,
-          "improved": false,
-          "gain": 0,
-          "score": 10.7977
+          "gain": 2.6237,
+          "score": 9.0607
         }
       ],
       [
@@ -99,189 +61,227 @@
           "family": 0,
           "improved": false,
           "gain": 0,
-          "score": 10.7067
+          "score": 8.9931
         },
         {
           "family": 1,
-          "improved": false,
-          "gain": 0,
-          "score": 10.7019
+          "improved": true,
+          "gain": 3.3766,
+          "score": 10.7783
         },
         {
           "family": 2,
-          "improved": false,
-          "gain": 0,
-          "score": 10.7498
+          "improved": true,
+          "gain": 0.0473,
+          "score": 10.8879
         },
         {
           "family": 3,
-          "improved": true,
-          "gain": 2.7044,
-          "score": 10.773
-        },
-        {
-          "family": 4,
           "improved": true,
           "gain": 1.5971,
-          "score": 6.3397
+          "score": 7.4378
+        },
+        {
+          "family": 4,
+          "improved": false,
+          "gain": 0,
+          "score": 10.8488
         },
         {
           "family": 5,
           "improved": true,
-          "gain": 0.0263,
-          "score": 8.0349
+          "gain": 3.2866,
+          "score": 9.0888
         }
       ],
       [
         {
           "family": 0,
           "improved": true,
-          "gain": 1.5845,
-          "score": 9.0966
+          "gain": 2.6099,
+          "score": 8.9323
         },
         {
           "family": 1,
           "improved": true,
-          "gain": 0.1545,
-          "score": 10.9027
+          "gain": 2.7533,
+          "score": 10.7739
         },
         {
           "family": 2,
-          "improved": false,
-          "gain": 0,
-          "score": 10.7503
+          "improved": true,
+          "gain": 0.03,
+          "score": 10.818
         },
         {
           "family": 3,
-          "improved": false,
-          "gain": 0,
-          "score": 10.5937
+          "improved": true,
+          "gain": 0.1443,
+          "score": 9.2094
         },
         {
           "family": 4,
-          "improved": true,
-          "gain": 1.0707,
-          "score": 7.32
+          "improved": false,
+          "gain": 0,
+          "score": 9.0812
         },
         {
           "family": 5,
           "improved": true,
-          "gain": 4.1847,
-          "score": 7.9226
+          "gain": 0.9438,
+          "score": 8.988
         }
       ],
       [
         {
           "family": 0,
           "improved": true,
-          "gain": 3.2061,
-          "score": 10.7661
+          "gain": 1.586,
+          "score": 6.4129
         },
         {
           "family": 1,
           "improved": true,
-          "gain": 0.1169,
-          "score": 10.8534
+          "gain": 0.0166,
+          "score": 10.5889
         },
         {
           "family": 2,
-          "improved": true,
-          "gain": 2.7252,
-          "score": 9.2354
+          "improved": false,
+          "gain": 0,
+          "score": 10.8813
         },
         {
           "family": 3,
           "improved": true,
-          "gain": 1.6026,
-          "score": 10.7035
+          "gain": 0.133,
+          "score": 9.086
         },
         {
           "family": 4,
-          "improved": false,
-          "gain": 0,
-          "score": 7.9218
+          "improved": true,
+          "gain": 0.0616,
+          "score": 9.2645
         },
         {
           "family": 5,
           "improved": true,
-          "gain": 0.1102,
-          "score": 10.7381
+          "gain": 0.0399,
+          "score": 10.6287
         }
       ],
       [
         {
           "family": 0,
           "improved": true,
-          "gain": 4.2103,
-          "score": 10.6672
+          "gain": 1.0675,
+          "score": 4.7417
         },
         {
           "family": 1,
           "improved": true,
-          "gain": 0.0057,
-          "score": 10.8716
+          "gain": 1.5325,
+          "score": 10.758
         },
         {
           "family": 2,
           "improved": true,
-          "gain": 2.6418,
-          "score": 10.6854
+          "gain": 0.0193,
+          "score": 10.883
         },
         {
           "family": 3,
           "improved": true,
-          "gain": 0.0699,
-          "score": 10.8153
+          "gain": 0.1019,
+          "score": 9.1703
         },
         {
           "family": 4,
           "improved": true,
-          "gain": 1.51,
-          "score": 4.7118
+          "gain": 0.0408,
+          "score": 10.6801
         },
         {
           "family": 5,
           "improved": true,
-          "gain": 1.5239,
-          "score": 10.6235
+          "gain": 0.0274,
+          "score": 10.7274
         }
       ],
       [
         {
           "family": 0,
-          "improved": false,
-          "gain": 0,
-          "score": 10.8159
+          "improved": true,
+          "gain": 2.6316,
+          "score": 6.3296
         },
         {
           "family": 1,
           "improved": true,
-          "gain": 1.6741,
-          "score": 10.7818
+          "gain": 0.0147,
+          "score": 10.7759
         },
         {
           "family": 2,
-          "improved": true,
-          "gain": 0.0793,
-          "score": 10.7957
+          "improved": false,
+          "gain": 0,
+          "score": 9.2316
         },
         {
           "family": 3,
           "improved": true,
-          "gain": 1.006,
-          "score": 9.0436
+          "gain": 0.0191,
+          "score": 10.7894
         },
         {
           "family": 4,
           "improved": true,
-          "gain": 1.5571,
-          "score": 7.3587
+          "gain": 2.6984,
+          "score": 10.8065
         },
         {
           "family": 5,
           "improved": false,
           "gain": 0,
-          "score": 10.6825
+          "score": 10.7369
+        }
+      ],
+      [
+        {
+          "family": 0,
+          "improved": true,
+          "gain": 1.0667,
+          "score": 4.8366
+        },
+        {
+          "family": 1,
+          "improved": true,
+          "gain": 4.2398,
+          "score": 9.0744
+        },
+        {
+          "family": 2,
+          "improved": false,
+          "gain": 0,
+          "score": 9.2368
+        },
+        {
+          "family": 3,
+          "improved": true,
+          "gain": 1.5842,
+          "score": 9.1794
+        },
+        {
+          "family": 4,
+          "improved": true,
+          "gain": 0.0514,
+          "score": 10.7886
+        },
+        {
+          "family": 5,
+          "improved": false,
+          "gain": 0,
+          "score": 8.0442
         }
       ]
     ],
@@ -290,28 +290,28 @@
       "description": "Candidate policies retain at least 25% contest probability in the tested desperate, advantageous contest and 20% trade probability for the tested trusted, superior partner. Selection among eligible candidates uses lineage survival. During play every action is sampled from the policy without quotas.",
       "checkpoints": [
         {
-          "contestedRefuge": 0.9999654714391932,
-          "trustedTrade": 0.9994899629763568
+          "contestedRefuge": 0.9781675018806804,
+          "trustedTrade": 0.9982648471139308
         },
         {
-          "contestedRefuge": 0.9994750537306651,
-          "trustedTrade": 0.9999953334907188
+          "contestedRefuge": 0.47012154016036106,
+          "trustedTrade": 0.9974198892689682
         },
         {
-          "contestedRefuge": 0.5429523925493001,
-          "trustedTrade": 0.9583073289946045
+          "contestedRefuge": 0.9999972897695496,
+          "trustedTrade": 0.66975697646987
         },
         {
-          "contestedRefuge": 0.9999587165151343,
-          "trustedTrade": 0.998888993050197
+          "contestedRefuge": 0.9999666814741438,
+          "trustedTrade": 0.45084020940699165
         },
         {
-          "contestedRefuge": 0.9895359013002123,
-          "trustedTrade": 0.31994666930720933
+          "contestedRefuge": 0.9967860429142673,
+          "trustedTrade": 0.8162016579440596
         },
         {
-          "contestedRefuge": 0.9999909005015762,
-          "trustedTrade": 0.40531026682308097
+          "contestedRefuge": 0.9869855619049691,
+          "trustedTrade": 0.31015086762176913
         }
       ]
     },
@@ -321,258 +321,306 @@
     {
       "type": "contextual",
       "bias": [
-        0.1108,
-        -0.1479,
-        1.3815,
-        0.5419,
-        0.2616,
-        0.0169,
-        0.4727,
-        -1.4225,
-        0.9509
+        0.9189,
+        0.6134,
+        2.2242,
+        0.5873,
+        -0.862,
+        -0.3385,
+        -2.798,
+        0.2978,
+        -0.613
       ],
       "weights": [
         0,
-        2.4975,
-        2.8726,
-        -1.5025,
-        -1.241,
-        -1.331,
-        -1.9098,
-        0.3111,
-        0.4991,
-        0.6926,
-        -0.4474,
-        0.7331
+        -0.6461,
+        3.5,
+        -0.8179,
+        -0.5137,
+        -0.1311,
+        0.507,
+        -0.2773,
+        0.0086,
+        0.9545,
+        0.6158,
+        0.9366
       ],
       "context": [
-        0.6353,
-        -0.4089,
-        0.0611,
-        0.6146,
-        2.3902,
-        0.9742,
-        0.0714,
-        0.2866,
-        1.4099
+        -0.3894,
+        0.1588,
+        0.3087,
+        0.6702,
+        0.1781,
+        0.4081,
+        -0.2227,
+        -1.1194,
+        -0.0383
       ],
-      "temperature": 0.1821,
-      "feedbackGain": 0.7132,
+      "temperature": 0.3685,
+      "feedbackGain": 0.4571,
+      "aptitude": [
+        0.1745,
+        0.2131,
+        0.8915,
+        0.2697,
+        0.8515,
+        0.3106
+      ],
       "id": "DF-01",
       "name": "Checkpoint 01"
     },
     {
       "type": "contextual",
       "bias": [
-        -0.4598,
-        -0.356,
-        1.9767,
-        0.8677,
-        -0.124,
-        0.1668,
-        0.3708,
-        -0.6851,
-        -1.7816
+        0.8403,
+        -0.1323,
+        1.3723,
+        0.4125,
+        -0.311,
+        -2.2298,
+        -0.2117,
+        -0.2167,
+        -0.9015
       ],
       "weights": [
         0,
-        -0.7867,
-        2.7881,
-        -0.0315,
-        -2.3381,
-        -1.4228,
-        -0.5466,
-        -0.4106,
-        0.4887,
-        -0.3212,
-        1.045,
-        0.3278
+        1.3741,
+        3.3339,
+        0.6831,
+        -0.6961,
+        0.4525,
+        2.7054,
+        -2.8328,
+        0.9589,
+        1.1747,
+        0.3452,
+        -0.6456
       ],
       "context": [
-        0.8063,
-        1.0041,
-        1.3856,
-        1.2978,
-        -0.66,
-        1.0722,
-        1.2546,
-        1.1512,
-        0.2385
+        -0.9854,
+        -0.7029,
+        0.0241,
+        -0.3174,
+        0.0482,
+        0.8734,
+        3.5,
+        1.7302,
+        0.8391
       ],
-      "temperature": 0.2446,
-      "feedbackGain": 0.8795,
+      "temperature": 0.5045,
+      "feedbackGain": 0.3356,
+      "aptitude": [
+        0.12,
+        0.9293,
+        0.2136,
+        0.9908,
+        0.4905,
+        0.4376
+      ],
       "id": "DF-02",
       "name": "Checkpoint 02"
     },
     {
       "type": "contextual",
       "bias": [
-        0.1513,
-        0.3238,
-        1.7271,
-        0.54,
-        0.8156,
-        -0.5743,
-        0.2463,
-        0.9897,
-        0.2935
+        0.0276,
+        -0.3998,
+        1.12,
+        -1.5755,
+        -0.3026,
+        -0.8619,
+        0.7008,
+        -0.764,
+        -0.6714
       ],
       "weights": [
         0,
-        1.3785,
-        2.3164,
-        -0.2444,
-        -1.5601,
-        -1.1936,
-        -0.6985,
-        1.1716,
-        -0.0421,
-        1.4583,
-        0.3302,
-        -0.2757
+        3.2697,
+        1.1761,
+        -0.1673,
+        -1.3261,
+        0.0043,
+        0.8022,
+        1.1424,
+        0.9195,
+        1.5721,
+        1.8084,
+        0.5286
       ],
       "context": [
-        0.4591,
-        1.8487,
-        1.1028,
-        1.5686,
-        -0.6838,
-        -1.0182,
-        1.413,
-        1.2565,
-        0.8236
+        1.9503,
+        -0.031,
+        1.7153,
+        0.3524,
+        0.3541,
+        0.5933,
+        1.7391,
+        0.5172,
+        -0.3323
       ],
-      "temperature": 0.2597,
-      "feedbackGain": 0.7219,
+      "temperature": 0.2423,
+      "feedbackGain": 0.7678,
+      "aptitude": [
+        1,
+        0.1069,
+        0.0441,
+        0,
+        0.7646,
+        0
+      ],
       "id": "DF-03",
       "name": "Checkpoint 03"
     },
     {
       "type": "contextual",
       "bias": [
-        0.1289,
-        0.7666,
-        0.8983,
-        0.1467,
-        -0.5477,
-        -0.3455,
-        -1.2222,
-        -0.415,
-        -0.289
+        -0.4178,
+        1.2018,
+        1.2521,
+        -1.2193,
+        1.4374,
+        0.1096,
+        0.2428,
+        -1.9337,
+        -1.259
       ],
       "weights": [
         0,
-        0.5018,
-        1.6215,
-        0.0294,
-        -0.2167,
-        0.7122,
-        1.4996,
-        1.3333,
-        -0.7303,
-        1.4609,
-        -0.2949,
-        0.0932
+        1.7844,
+        1.4155,
+        0.9313,
+        -1.2667,
+        -0.0111,
+        -0.1386,
+        0.1572,
+        1.555,
+        1.1618,
+        -0.0677,
+        -0.0526
       ],
       "context": [
-        1.1265,
-        0.3073,
-        -0.0394,
-        0.5341,
-        1.1547,
-        1.6332,
-        0.4122,
-        0.574,
-        -0.631
+        -1.1034,
+        0.5158,
+        -0.3879,
+        0.4548,
+        -0.0773,
+        1.2686,
+        0.9226,
+        0.2376,
+        1.6139
       ],
-      "temperature": 0.2527,
-      "feedbackGain": 0.8656,
+      "temperature": 0.4381,
+      "feedbackGain": 0.4331,
+      "aptitude": [
+        0,
+        0.2819,
+        0.9324,
+        0,
+        0.5169,
+        1
+      ],
       "id": "DF-04",
       "name": "Checkpoint 04"
     },
     {
       "type": "contextual",
       "bias": [
-        -0.976,
-        0.8437,
-        0.3048,
-        -0.7181,
-        1.5117,
-        0.3929,
-        1.3766,
-        -0.3732,
-        0.7948
+        -0.3349,
+        -0.2952,
+        0.0885,
+        -1.7673,
+        -0.6133,
+        -0.557,
+        0.7572,
+        -0.9333,
+        0.2684
       ],
       "weights": [
         0,
-        1.7957,
-        0.8471,
-        -0.864,
-        -0.2428,
-        0.2092,
-        1.187,
-        -0.1454,
-        0.6274,
-        2.2843,
-        -2.2756,
-        1.0667
+        0.7052,
+        1.6761,
+        0.3688,
+        -2.1187,
+        -0.1391,
+        0.3827,
+        -1.3064,
+        0.1174,
+        1.5761,
+        0.6403,
+        -1.6573
       ],
       "context": [
-        0.8216,
-        -1.2401,
-        0.4303,
-        0.2391,
-        1.3892,
-        1.1746,
-        1.1145,
-        1.6123,
-        0.3664
+        0.6559,
+        -0.3558,
+        -0.6379,
+        1.2397,
+        -0.1431,
+        -0.7093,
+        1.558,
+        0.4965,
+        -0.4059
       ],
-      "temperature": 0.4299,
-      "feedbackGain": 1.0333,
+      "temperature": 0.2981,
+      "feedbackGain": 0.8071,
+      "aptitude": [
+        0.1875,
+        0.8919,
+        0.2739,
+        0.1621,
+        0,
+        1
+      ],
       "id": "DF-05",
       "name": "Checkpoint 05"
     },
     {
       "type": "contextual",
       "bias": [
-        0.4602,
-        0.429,
-        0.5857,
-        -0.7307,
-        -1.9032,
-        -1.0023,
-        -0.0001,
-        0.6402,
-        -0.3781
+        -1.4287,
+        0.2192,
+        0.0879,
+        -0.5782,
+        -2.089,
+        -0.7377,
+        2.1337,
+        0.261,
+        0.8362
       ],
       "weights": [
         0,
-        2.4137,
-        2.0002,
-        0.3521,
-        -1.2236,
-        -1.1469,
-        0.7427,
-        -0.4317,
-        2.0018,
-        -0.8165,
-        0.191,
-        -0.7234
+        -0.8343,
+        2.1163,
+        0.1697,
+        0.3643,
+        -0.3507,
+        -2.0402,
+        0.4674,
+        1.8568,
+        0.1391,
+        0.4571,
+        -2.6207
       ],
       "context": [
-        -0.1893,
-        -0.4408,
-        2.6455,
-        -0.356,
-        0.2159,
-        2.8469,
-        -2.17,
-        -0.266,
-        1.0522
+        0.6579,
+        0.1515,
+        0.5161,
+        -0.1394,
+        -0.9757,
+        -0.7701,
+        1.0898,
+        -0.9668,
+        1.8042
       ],
-      "temperature": 0.3246,
-      "feedbackGain": 0.7941,
+      "temperature": 0.2733,
+      "feedbackGain": 0.8048,
+      "aptitude": [
+        0.0503,
+        0.3168,
+        0.7012,
+        0.6269,
+        0,
+        1
+      ],
       "id": "DF-06",
       "name": "Checkpoint 06"
     }

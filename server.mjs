@@ -10,20 +10,16 @@ const root = fileURLToPath(new URL('.', import.meta.url)),
 const desktop = process.parentPort;
 const digest = (value) => createHash('sha256').update(value).digest('hex').slice(0, 20);
 const read = (name) => readFile(path.join(root, name), 'utf8');
-const [engine, policy, checkpoints] = await Promise.all(
-  ['engine.mjs', 'policy.mjs', 'models.json'].map(read),
+const rules = await Promise.all(
+  ['engine.mjs', 'policy.mjs', 'flight.mjs', 'commanders.mjs', 'encounters.mjs', 'models.json'].map(
+    async (name) => [name, await read(name)],
+  ),
 );
-const models = JSON.parse(checkpoints).models,
-  version = digest(engine + policy + checkpoints),
+const models = JSON.parse(rules.at(-1)[1]).models,
+  version = digest(JSON.stringify(rules)),
   bundle = path.join(store, 'rules', version);
 await mkdir(bundle, { recursive: true });
-await Promise.all(
-  [
-    ['engine.mjs', engine],
-    ['policy.mjs', policy],
-    ['models.json', checkpoints],
-  ].map(([n, v]) => writeFile(path.join(bundle, n), v)),
-);
+await Promise.all(rules.map(([name, source]) => writeFile(path.join(bundle, name), source)));
 const pool = new Map();
 let serial = 0;
 const defaultRun = {
@@ -37,6 +33,8 @@ const defaultRun = {
 const assets = new Map(
   Object.entries({
     '/': 'index.html',
+    '/flight.mjs': 'flight.mjs',
+    '/system-view.js': 'system-view.js',
     '/app.js': 'app.js',
     '/observatory.css': 'observatory.css',
     '/starfield.js': 'starfield.js',
@@ -198,7 +196,7 @@ const server = http.createServer(async (req, res) => {
       await acquire(r.id);
       return send({ id: r.id });
     }
-    const m = p.match(/^\/api\/([a-f0-9]{20})\/(status|frame|log|ledger|fork|trace)$/);
+    const m = p.match(/^\/api\/([a-f0-9]{20})\/(status|frame|system|log|ledger|fork|trace)$/);
     if (!m) return send({ error: 'Not found' }, 404);
     const h = await acquire(m[1]),
       op = m[2];
@@ -233,7 +231,8 @@ const server = http.createServer(async (req, res) => {
         args[k] = Number(args[k]);
         if (!Number.isSafeInteger(args[k])) throw Error('Invalid replay coordinate');
       }
-    if (['frame', 'log', 'trace', 'ledger'].includes(op)) return send(await query(h, op, args));
+    if (['system', 'frame', 'log', 'trace', 'ledger'].includes(op))
+      return send(await query(h, op, args));
     send({ error: 'Method not allowed' }, 405);
   } catch (e) {
     send({ error: e.code === 'ENOENT' ? 'Run or asset unavailable' : e.message }, 400);

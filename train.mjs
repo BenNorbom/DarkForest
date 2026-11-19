@@ -42,6 +42,9 @@ function mutate(parent, random, scale) {
       return rounded(bound(v + normal() * scale, -3.5, 3.5));
     });
   }
+  child.aptitude = (parent.aptitude || [0.5, 0.45, 0.4, 0.65, 0.55, 0.45]).map((v) =>
+    rounded(bound(v + normal() * scale, 0, 1)),
+  );
   child.temperature = rounded(bound(child.temperature * Math.exp(normal() * scale * 0.35), 0.18, 0.6));
   child.feedbackGain = rounded(bound(child.feedbackGain + normal() * scale * 0.22, 0.2, 1.35));
   return child;

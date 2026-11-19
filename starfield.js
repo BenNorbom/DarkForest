@@ -1,3 +1,4 @@
+import {cruiseState,routePosition} from './flight.mjs';
 // The renderer only knows the observation frame supplied by the caller.
 // All moving marks are positioned using simulation time, including on replay.
 const TAU = 2 * Math.PI;
@@ -68,9 +69,9 @@ function makeSky() {
       const cold = Math.exp(-2 * ((u + 0.29) ** 2 + (v + 0.17) ** 2));
       const grain = rng() * 2.4;
       const i = (y * sky.width + x) * 4;
-      pixels.data[i] = 5 + 24 * light + 49 * core + grain;
-      pixels.data[i + 1] = 11 + 35 * light + 34 * core + 3 * cold + grain;
-      pixels.data[i + 2] = 21 + 58 * light + 28 * core + 3 * cold + grain;
+      pixels.data[i] = 6 + 38 * light + 86 * core + grain;
+      pixels.data[i + 1] = 11 + 40 * light + 56 * core + 3 * cold + grain;
+      pixels.data[i + 2] = 23 + 70 * light + 35 * core + 3 * cold + grain;
       pixels.data[i + 3] = 255;
     }
   }
@@ -142,14 +143,14 @@ export function createStarMap(canvas, onSelect = () => {}) {
     const v = -sinYaw * dx + cosYaw * dy;
     return [
       width / 2 + scale * u,
-      height / 2 + scale * (v * cosPitch + dz * sinPitch),
-      dz * cosPitch - v * sinPitch,
+      height / 2 + scale * (v * cosPitch - dz * sinPitch),
+      dz * cosPitch + v * sinPitch,
     ];
   }
   function shiftCamera(x, y) {
     camera.x += (x * cosYaw - y * sinYaw * cosPitch) / scale;
     camera.y += (x * sinYaw + y * cosYaw * cosPitch) / scale;
-    camera.z += (y * sinPitch) / scale;
+    camera.z -= (y * sinPitch) / scale;
   }
   function updateBounds(systems) {
     for (const [axis, half] of [
@@ -175,7 +176,7 @@ export function createStarMap(canvas, onSelect = () => {}) {
         y = star.y - bounds.y,
         z = (star.z ?? 0) - bounds.z;
       fitWidth = Math.max(fitWidth, 2 * Math.abs(c * x + s * y));
-      fitHeight = Math.max(fitHeight, 2 * Math.abs((-s * x + c * y) * tilt + z * lift));
+      fitHeight = Math.max(fitHeight, 2 * Math.abs((-s * x + c * y) * tilt - z * lift));
     }
   }
   function resize() {
@@ -243,14 +244,17 @@ export function createStarMap(canvas, onSelect = () => {}) {
       len = Math.hypot(dx, dy);
     if (len < 2) return;
     const t = (frame.year - trip.start) / (trip.end - trip.start);
-    const x = mix(ax, bx, t),
-      y = mix(ay, by, t);
+    const f = trip.path ? cruiseState(trip.path, frame.year - trip.start).fraction : t;
+    const [x, y] = trip.path?.start
+      ? project(...routePosition(trip.path, frame.year - trip.start))
+      : [mix(ax, bx, f), mix(ay, by, f)];
     const selected = frame.selected === a.id || frame.selected === b.id;
+    if (frame.localRoutes && !selected) return;
     const color = trip.color || (signal ? '#8ed8ca' : '#e1bb77');
     g.save();
     g.strokeStyle = color;
     g.fillStyle = color;
-    g.globalAlpha = selected ? 0.69 : 0.34;
+    g.globalAlpha = selected ? 0.72 : 0.11;
     g.lineWidth = selected ? 1.35 : 0.9;
     if (signal) g.setLineDash([2, 5]);
     g.beginPath();
@@ -259,6 +263,17 @@ export function createStarMap(canvas, onSelect = () => {}) {
     g.stroke();
     g.setLineDash([]);
     g.globalAlpha = selected ? 0.98 : 0.83;
+    if (!signal) {
+      const trail = g.createLinearGradient(mix(ax, x, 0.77), mix(ay, y, 0.77), x, y);
+      trail.addColorStop(0, 'transparent');
+      trail.addColorStop(1, color);
+      g.strokeStyle = trail;
+      g.lineWidth = 2.4;
+      g.beginPath();
+      g.moveTo(mix(ax, x, 0.77), mix(ay, y, 0.77));
+      g.lineTo(x, y);
+      g.stroke();
+    }
     g.translate(x, y);
     g.rotate(Math.atan2(dy, dx));
     if (signal) {
@@ -346,6 +361,12 @@ export function createStarMap(canvas, onSelect = () => {}) {
         circle(g, x, y, r + 3);
         g.stroke();
       }
+      if(s.contested){
+        g.strokeStyle='#ffac78';g.lineWidth=1.8;g.globalAlpha=.95;
+        for(let i=0;i<3;i++){
+          g.beginPath();g.arc(x,y,r+7,i*TAU/3+.15,(i+1)*TAU/3-.22);g.stroke();
+        }
+      }
       if (selected || hot) {
         const gap = selected ? 15 : 10;
         const arm = selected ? 5 : 3.5;
@@ -362,7 +383,7 @@ export function createStarMap(canvas, onSelect = () => {}) {
         g.stroke();
       }
       g.globalAlpha = 1;
-      const priority = selected ? 5 : hot ? 4 : s.home && controlled ? 3 : controlled ? 2 : 1;
+      const priority = selected ? 5 : hot ? 4 : s.contested ? 3 : s.home && controlled ? 3 : controlled ? 2 : 1;
       if (smallScene || priority >= 3 || (camera.zoom >= 1.75 && priority >= 2) || camera.zoom >= 3) {
         labels.push({ s, x, y, priority, selected, hot });
       }
@@ -435,6 +456,37 @@ export function createStarMap(canvas, onSelect = () => {}) {
       g.globalAlpha = 1;
     }
     marks();
+    const center = project(camera.x, camera.y, camera.z);
+    g.save();
+    g.translate(38, height - 70);
+    g.font = '9px monospace';
+    for (const [i, label] of ['X', 'Y', 'Z'].entries()) {
+      const xyz = [camera.x, camera.y, camera.z];
+      xyz[i] += 21 / scale;
+      const p = project(...xyz),
+        dx = p[0] - center[0],
+        dy = p[1] - center[1];
+      g.strokeStyle = g.fillStyle = ['#f0ac83', '#95dcb5', '#8abde7'][i];
+      g.beginPath();
+      g.moveTo(0, 0);
+      g.lineTo(dx, dy);
+      g.stroke();
+      g.fillText(label, dx + 2, dy - 2);
+    }
+    if (frame.distanceScale && width > 520) {
+      const target = (65 * frame.distanceScale) / scale;
+      const step = 10 ** Math.floor(Math.log10(target));
+      const ly = ([5, 2, 1].find((n) => n * step <= target) || 1) * step;
+      const end = 44 + (ly / frame.distanceScale) * scale;
+      g.strokeStyle = '#88a8b3';
+      g.fillStyle = '#c3d3db';
+      g.beginPath();
+      g.moveTo(44, 0);
+      g.lineTo(end, 0);
+      g.stroke();
+      g.fillText(ly.toPrecision(2) + ' ly', 44, -5);
+    }
+    g.restore();
     if (travel) schedulePaint();
   }
   function schedulePaint() {

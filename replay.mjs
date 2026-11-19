@@ -10,7 +10,7 @@ const lastIndex = (rows, t, field = 't') => {
 };
 const latest = (rows, t) => rows[lastIndex(rows, t)];
 const isContest = (e) =>
-  e?.kind === 'conflict' && ['Control transferred', 'Expedition repelled'].includes(e.title);
+  e?.kind === 'conflict' && ['Control transferred', 'Expedition repelled','Facility disabled'].includes(e.title);
 const isPassage = (e) => e.kind === 'report' && e.title.startsWith('Passage offer · ');
 const isForeignTrade = (e) => e.kind === 'trade' && e.actor != null && e.actor !== e.previous;
 const localPriority = (e) =>
@@ -119,10 +119,23 @@ export function indexReplay(run) {
     orders[d.site].push(d);
     decision.set(d.key, d);
   }
+  const exits=new Map(salient.filter(e=>e.kind==='conflict'&&e.commander).map(e=>[e.commander,e.t]));
+  const conflicts=run.chart.map((_,site)=>{
+    const intervals=[];
+    for(const tape of run.encounters?.[site]||[])for(const {time,entry} of tape.inputs){
+      if(entry?.kind!=='contest')continue;
+      const owner=latest(run.history[site],time)?.owner;
+      if(owner==null||owner===entry.owner)continue;
+      const end=exits.get(entry.captain.id)??tape.end,previous=intervals.at(-1);
+      if(previous&&previous.end>=time)previous.end=Math.max(previous.end,end);
+      else intervals.push({t:time,end});
+    }
+    return intervals;
+  });
   const maxFlight = run.flights.reduce((v, f) => Math.max(v, f.end - f.start), 0);
   return {
     run,
-    bySite,
+    bySite,conflicts,
     orders,
     reports,
     decision,
@@ -130,6 +143,7 @@ export function indexReplay(run) {
     localBeats,
     localNews,
     globalLog,
+    battles:salient.filter(e=>isContest(e)&&e.encounter!=null),
     maxFlight,
     track: highlightTrack(run),
   };
@@ -163,7 +177,7 @@ export function header(idx) {
     idx.track[upcoming] ??
     idx.track.at(-1);
   return {
-    version: r.version,
+    version: r.version, scale:r.scale,
     seed: r.seed,
     years: r.years,
     count: r.count,
@@ -216,7 +230,8 @@ export function frame(idx, { month = 0, site = 0, lens = -1, event = -1, followF
   });
   const systems = r.chart.map(({ id, x, y, z = 0, name }, i) => {
     const { owner, known, stale, home } = info[i];
-    return { id, x, y, z, name, owner, known, stale, home, color: r.civs[owner]?.color };
+    const contested=lens<0 && (latest(idx.conflicts[i],t)?.end??-1)>t;
+    return { id, x, y, z, name, owner, known, stale, home, contested, color: r.civs[owner]?.color };
   });
   const active = [];
   for (let i = lastIndex(r.flights, t, 'start'); i >= 0; i--) {
@@ -258,6 +273,7 @@ export function frame(idx, { month = 0, site = 0, lens = -1, event = -1, followF
   }
   const nextHighlight = lens < 0 ? (idx.track[globalBeat + 1]?.t ?? null) : next;
   const localMoment = allowed ? selected : crossed || highlight?.t === t ? highlight.e : null;
+  const upcomingBattle=lens<0?idx.battles[lastIndex(idx.battles,t)+1]:null;
   const state = info[site],
     civ = r.civs[state.owner];
   return {
@@ -275,9 +291,11 @@ export function frame(idx, { month = 0, site = 0, lens = -1, event = -1, followF
       model: lens < 0 || site === lens ? civ?.model : null,
     },
     feed,
-    news: pickRecent(lens < 0 ? idx.salient : idx.localNews[lens], t, 24, canSee)
-      .map((e) => describeHighlight(r, e)),
+    news: pickRecent(lens < 0 ? idx.salient : idx.localNews[lens], t, 24, canSee).map((e) =>
+      describeHighlight(r, e),
+    ),
     decision: visibleDecision,
+    nextBattle:upcomingBattle?{t:upcomingBattle.t,site:upcomingBattle.site,start:upcomingBattle.encounter}:null,
     nextBeat: next,
     nextHighlight,
     highlight: describeHighlight(
