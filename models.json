@@ -1,0 +1,580 @@
+{
+  "version": 1,
+  "algorithm": "Population-based evolutionary policy search",
+  "training": {
+    "version": "lineage-crossplay-2",
+    "simulatorVersion": "parallax-1",
+    "seed": 792773,
+    "rounds": 7,
+    "rollouts": 672,
+    "populationSize": 6,
+    "trialsPerRound": 4,
+    "challengers": 3,
+    "trainingWorlds": 28,
+    "trainingHorizons": [
+      65,
+      100,
+      135,
+      165
+    ],
+    "history": [
+      [
+        {
+          "family": 0,
+          "improved": true,
+          "gain": 2.8325,
+          "score": 9.1834
+        },
+        {
+          "family": 1,
+          "improved": true,
+          "gain": 3.1963,
+          "score": 10.6575
+        },
+        {
+          "family": 2,
+          "improved": true,
+          "gain": 1.7705,
+          "score": 8.1664
+        },
+        {
+          "family": 3,
+          "improved": true,
+          "gain": 1.7762,
+          "score": 6.483
+        },
+        {
+          "family": 4,
+          "improved": true,
+          "gain": 2.627,
+          "score": 4.7236
+        },
+        {
+          "family": 5,
+          "improved": true,
+          "gain": 0.0401,
+          "score": 9.107
+        }
+      ],
+      [
+        {
+          "family": 0,
+          "improved": true,
+          "gain": 5.4587,
+          "score": 10.7813
+        },
+        {
+          "family": 1,
+          "improved": true,
+          "gain": 0.054,
+          "score": 10.8549
+        },
+        {
+          "family": 2,
+          "improved": true,
+          "gain": 1.5734,
+          "score": 9.1465
+        },
+        {
+          "family": 3,
+          "improved": true,
+          "gain": 2.6697,
+          "score": 10.6743
+        },
+        {
+          "family": 4,
+          "improved": true,
+          "gain": 3.1288,
+          "score": 7.3552
+        },
+        {
+          "family": 5,
+          "improved": false,
+          "gain": 0,
+          "score": 10.7977
+        }
+      ],
+      [
+        {
+          "family": 0,
+          "improved": false,
+          "gain": 0,
+          "score": 10.7067
+        },
+        {
+          "family": 1,
+          "improved": false,
+          "gain": 0,
+          "score": 10.7019
+        },
+        {
+          "family": 2,
+          "improved": false,
+          "gain": 0,
+          "score": 10.7498
+        },
+        {
+          "family": 3,
+          "improved": true,
+          "gain": 2.7044,
+          "score": 10.773
+        },
+        {
+          "family": 4,
+          "improved": true,
+          "gain": 1.5971,
+          "score": 6.3397
+        },
+        {
+          "family": 5,
+          "improved": true,
+          "gain": 0.0263,
+          "score": 8.0349
+        }
+      ],
+      [
+        {
+          "family": 0,
+          "improved": true,
+          "gain": 1.5845,
+          "score": 9.0966
+        },
+        {
+          "family": 1,
+          "improved": true,
+          "gain": 0.1545,
+          "score": 10.9027
+        },
+        {
+          "family": 2,
+          "improved": false,
+          "gain": 0,
+          "score": 10.7503
+        },
+        {
+          "family": 3,
+          "improved": false,
+          "gain": 0,
+          "score": 10.5937
+        },
+        {
+          "family": 4,
+          "improved": true,
+          "gain": 1.0707,
+          "score": 7.32
+        },
+        {
+          "family": 5,
+          "improved": true,
+          "gain": 4.1847,
+          "score": 7.9226
+        }
+      ],
+      [
+        {
+          "family": 0,
+          "improved": true,
+          "gain": 3.2061,
+          "score": 10.7661
+        },
+        {
+          "family": 1,
+          "improved": true,
+          "gain": 0.1169,
+          "score": 10.8534
+        },
+        {
+          "family": 2,
+          "improved": true,
+          "gain": 2.7252,
+          "score": 9.2354
+        },
+        {
+          "family": 3,
+          "improved": true,
+          "gain": 1.6026,
+          "score": 10.7035
+        },
+        {
+          "family": 4,
+          "improved": false,
+          "gain": 0,
+          "score": 7.9218
+        },
+        {
+          "family": 5,
+          "improved": true,
+          "gain": 0.1102,
+          "score": 10.7381
+        }
+      ],
+      [
+        {
+          "family": 0,
+          "improved": true,
+          "gain": 4.2103,
+          "score": 10.6672
+        },
+        {
+          "family": 1,
+          "improved": true,
+          "gain": 0.0057,
+          "score": 10.8716
+        },
+        {
+          "family": 2,
+          "improved": true,
+          "gain": 2.6418,
+          "score": 10.6854
+        },
+        {
+          "family": 3,
+          "improved": true,
+          "gain": 0.0699,
+          "score": 10.8153
+        },
+        {
+          "family": 4,
+          "improved": true,
+          "gain": 1.51,
+          "score": 4.7118
+        },
+        {
+          "family": 5,
+          "improved": true,
+          "gain": 1.5239,
+          "score": 10.6235
+        }
+      ],
+      [
+        {
+          "family": 0,
+          "improved": false,
+          "gain": 0,
+          "score": 10.8159
+        },
+        {
+          "family": 1,
+          "improved": true,
+          "gain": 1.6741,
+          "score": 10.7818
+        },
+        {
+          "family": 2,
+          "improved": true,
+          "gain": 0.0793,
+          "score": 10.7957
+        },
+        {
+          "family": 3,
+          "improved": true,
+          "gain": 1.006,
+          "score": 9.0436
+        },
+        {
+          "family": 4,
+          "improved": true,
+          "gain": 1.5571,
+          "score": 7.3587
+        },
+        {
+          "family": 5,
+          "improved": false,
+          "gain": 0,
+          "score": 10.6825
+        }
+      ]
+    ],
+    "objective": "4 × surviving lineage + 6 × viable community + bounded population and viable-refuge resilience (0–1). Extinct lineages score zero.",
+    "deploymentProbes": {
+      "description": "Candidate policies retain at least 25% contest probability in the tested desperate, advantageous contest and 20% trade probability for the tested trusted, superior partner. Selection among eligible candidates uses lineage survival. During play every action is sampled from the policy without quotas.",
+      "checkpoints": [
+        {
+          "contestedRefuge": 0.9999654714391932,
+          "trustedTrade": 0.9994899629763568
+        },
+        {
+          "contestedRefuge": 0.9994750537306651,
+          "trustedTrade": 0.9999953334907188
+        },
+        {
+          "contestedRefuge": 0.5429523925493001,
+          "trustedTrade": 0.9583073289946045
+        },
+        {
+          "contestedRefuge": 0.9999587165151343,
+          "trustedTrade": 0.998888993050197
+        },
+        {
+          "contestedRefuge": 0.9895359013002123,
+          "trustedTrade": 0.31994666930720933
+        },
+        {
+          "contestedRefuge": 0.9999909005015762,
+          "trustedTrade": 0.40531026682308097
+        }
+      ]
+    },
+    "adaptation": "Decision weights are frozen during play. Locally delivered observations and remembered encounters change the scores of available actions."
+  },
+  "models": [
+    {
+      "type": "contextual",
+      "bias": [
+        0.1108,
+        -0.1479,
+        1.3815,
+        0.5419,
+        0.2616,
+        0.0169,
+        0.4727,
+        -1.4225,
+        0.9509
+      ],
+      "weights": [
+        0,
+        2.4975,
+        2.8726,
+        -1.5025,
+        -1.241,
+        -1.331,
+        -1.9098,
+        0.3111,
+        0.4991,
+        0.6926,
+        -0.4474,
+        0.7331
+      ],
+      "context": [
+        0.6353,
+        -0.4089,
+        0.0611,
+        0.6146,
+        2.3902,
+        0.9742,
+        0.0714,
+        0.2866,
+        1.4099
+      ],
+      "temperature": 0.1821,
+      "feedbackGain": 0.7132,
+      "id": "DF-01",
+      "name": "Checkpoint 01"
+    },
+    {
+      "type": "contextual",
+      "bias": [
+        -0.4598,
+        -0.356,
+        1.9767,
+        0.8677,
+        -0.124,
+        0.1668,
+        0.3708,
+        -0.6851,
+        -1.7816
+      ],
+      "weights": [
+        0,
+        -0.7867,
+        2.7881,
+        -0.0315,
+        -2.3381,
+        -1.4228,
+        -0.5466,
+        -0.4106,
+        0.4887,
+        -0.3212,
+        1.045,
+        0.3278
+      ],
+      "context": [
+        0.8063,
+        1.0041,
+        1.3856,
+        1.2978,
+        -0.66,
+        1.0722,
+        1.2546,
+        1.1512,
+        0.2385
+      ],
+      "temperature": 0.2446,
+      "feedbackGain": 0.8795,
+      "id": "DF-02",
+      "name": "Checkpoint 02"
+    },
+    {
+      "type": "contextual",
+      "bias": [
+        0.1513,
+        0.3238,
+        1.7271,
+        0.54,
+        0.8156,
+        -0.5743,
+        0.2463,
+        0.9897,
+        0.2935
+      ],
+      "weights": [
+        0,
+        1.3785,
+        2.3164,
+        -0.2444,
+        -1.5601,
+        -1.1936,
+        -0.6985,
+        1.1716,
+        -0.0421,
+        1.4583,
+        0.3302,
+        -0.2757
+      ],
+      "context": [
+        0.4591,
+        1.8487,
+        1.1028,
+        1.5686,
+        -0.6838,
+        -1.0182,
+        1.413,
+        1.2565,
+        0.8236
+      ],
+      "temperature": 0.2597,
+      "feedbackGain": 0.7219,
+      "id": "DF-03",
+      "name": "Checkpoint 03"
+    },
+    {
+      "type": "contextual",
+      "bias": [
+        0.1289,
+        0.7666,
+        0.8983,
+        0.1467,
+        -0.5477,
+        -0.3455,
+        -1.2222,
+        -0.415,
+        -0.289
+      ],
+      "weights": [
+        0,
+        0.5018,
+        1.6215,
+        0.0294,
+        -0.2167,
+        0.7122,
+        1.4996,
+        1.3333,
+        -0.7303,
+        1.4609,
+        -0.2949,
+        0.0932
+      ],
+      "context": [
+        1.1265,
+        0.3073,
+        -0.0394,
+        0.5341,
+        1.1547,
+        1.6332,
+        0.4122,
+        0.574,
+        -0.631
+      ],
+      "temperature": 0.2527,
+      "feedbackGain": 0.8656,
+      "id": "DF-04",
+      "name": "Checkpoint 04"
+    },
+    {
+      "type": "contextual",
+      "bias": [
+        -0.976,
+        0.8437,
+        0.3048,
+        -0.7181,
+        1.5117,
+        0.3929,
+        1.3766,
+        -0.3732,
+        0.7948
+      ],
+      "weights": [
+        0,
+        1.7957,
+        0.8471,
+        -0.864,
+        -0.2428,
+        0.2092,
+        1.187,
+        -0.1454,
+        0.6274,
+        2.2843,
+        -2.2756,
+        1.0667
+      ],
+      "context": [
+        0.8216,
+        -1.2401,
+        0.4303,
+        0.2391,
+        1.3892,
+        1.1746,
+        1.1145,
+        1.6123,
+        0.3664
+      ],
+      "temperature": 0.4299,
+      "feedbackGain": 1.0333,
+      "id": "DF-05",
+      "name": "Checkpoint 05"
+    },
+    {
+      "type": "contextual",
+      "bias": [
+        0.4602,
+        0.429,
+        0.5857,
+        -0.7307,
+        -1.9032,
+        -1.0023,
+        -0.0001,
+        0.6402,
+        -0.3781
+      ],
+      "weights": [
+        0,
+        2.4137,
+        2.0002,
+        0.3521,
+        -1.2236,
+        -1.1469,
+        0.7427,
+        -0.4317,
+        2.0018,
+        -0.8165,
+        0.191,
+        -0.7234
+      ],
+      "context": [
+        -0.1893,
+        -0.4408,
+        2.6455,
+        -0.356,
+        0.2159,
+        2.8469,
+        -2.17,
+        -0.266,
+        1.0522
+      ],
+      "temperature": 0.3246,
+      "feedbackGain": 0.7941,
+      "id": "DF-06",
+      "name": "Checkpoint 06"
+    }
+  ]
+}
